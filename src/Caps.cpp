@@ -106,7 +106,7 @@ std::string Caps::get (const std::string& key, int x, int y)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string Caps::get (const std::string& key, const std::string value)
+std::string Caps::get (const std::string& key, const std::string& value)
 {
   // TODO Lookup term
   // TODO Default is xterm
