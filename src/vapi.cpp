@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <sys/ioctl.h>
-#include <ncurses.h>
+//#include <ncurses.h>
 #include <term.h>
 #include "vapi.h"
 
@@ -80,6 +80,7 @@ bool vapi_initialize ()
   char* term = getenv ("TERM");
   if (term)
   {
+/*
     if (tgetent (buffer, term) > 0)
     {
       screenWidth  = tgetnum  ((char*) "co");
@@ -100,6 +101,7 @@ bool vapi_initialize ()
 
       return true;
     }
+*/
   }
 
   return false;
