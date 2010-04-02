@@ -2,9 +2,14 @@ CMakeCache.txt
 CMakeFiles/*
 Makefile
 cmake_install.cmake
-examples/CMakeFiles/*
-examples/Makefile
-examples/cmake_install.cmake
 src/CMakeFiles/*
 src/Makefile
 src/cmake_install.cmake
+src/liblibvitapi.a
+examples/CMakeFiles/*
+examples/Makefile
+examples/cmake_install.cmake
+examples/drag
+examples/keys
+examples/rectangles
+examples/speed
