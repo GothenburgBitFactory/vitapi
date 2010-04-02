@@ -96,6 +96,7 @@ bool iapi_initialize ()
   if (tty.c_lflag & ECHO)    std::cout << "#   ECHO"    << std::endl;
 */
 
+/*
   char* term = getenv ("TERM");
   char buffer[2048];
   if ((term && tgetent (buffer, term) > 0) ||
@@ -109,12 +110,14 @@ bool iapi_initialize ()
     assign (bufp, IAPI_KEY_RIGHT,     "kr");
     assign (bufp, IAPI_KEY_UP,        "ku");
     assign (bufp, IAPI_KEY_DOWN,      "kd");
+*/
 /*
     sequences[IAPI_KEY_LEFT]          = "\033[D";
     sequences[IAPI_KEY_RIGHT]         = "\033[C";
     sequences[IAPI_KEY_UP]            = "\033[A";
     sequences[IAPI_KEY_DOWN]          = "\033[B";
 */
+/*
     assign (bufp, IAPI_KEY_F1,        "k1");
     assign (bufp, IAPI_KEY_F2,        "k2");
     assign (bufp, IAPI_KEY_F3,        "k3");
@@ -135,6 +138,7 @@ bool iapi_initialize ()
     std::cout << "\033[?1h";          // Application cursor keys
     return true;
   }
+*/
 
   return false;
 }
