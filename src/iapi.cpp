@@ -404,7 +404,8 @@ static bool same (const std::string& known, const std::deque <int>& unknown)
 ////////////////////////////////////////////////////////////////////////////////
 static void assign (char* buffer, int key, const char* name)
 {
-  char* value = tgetstr ((char*) name, &buffer);
+  // char* value = tgetstr ((char*) name, &buffer);
+  char* value;
   if (value)
     sequences[key] = value;
 }
