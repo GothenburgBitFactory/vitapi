@@ -1,0 +1,6 @@
+Vitapi - Visual, Input and Terminal API for interacting with modern terminals.
+
+Vitapi is a library that provides routines that can read keyboard input and
+interact with your terminal to provide support for building a character-based
+UI.
+

@@ -1,0 +1,24 @@
+
+New Features in vitapi 0.1
+
+  - ?
+
+  Please refer to the ChangeLog file for full details.  There are too many to
+  list here.
+
+Vitapi has been built and tested on the following configurations:
+
+  * OS X 10.6 Snow Leopard
+
+and with the following $TERM values:
+
+  * xterm-256color
+
+While Vitapi has undergone testing, bugs are sure to remain.  If you
+encounter a bug, please send a message to:
+
+  support@vitapi.org
+
+Thank you.
+
+---
