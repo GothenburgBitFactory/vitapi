@@ -1,0 +1,13 @@
+Installation Instructions
+
+For a first-time build, run these commands to generate the makefiles and then
+build the binaries.
+
+    $ cmake .
+    $ make
+    $ sudo make install
+
+You will need cmake installed in order to build the software, which is
+available from www.cmake.org.
+
+---
