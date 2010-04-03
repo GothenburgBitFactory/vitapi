@@ -5,4 +5,4 @@ set (vitapi_SRCS Caps.cpp Caps.h
                  iapi.cpp iapi.h
                  util.cpp util.h
                  vapi.cpp vapi.h)
-add_library (libvitapi STATIC ${vitapi_SRCS})
+add_library (vitapi STATIC ${vitapi_SRCS})
