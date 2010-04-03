@@ -30,7 +30,7 @@
 #include <vector>
 #include <algorithm>
 #include "Color.h"
-#include "text.h"
+#include "util.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 static struct

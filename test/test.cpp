@@ -27,8 +27,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string.h>
-#include <util.h>
-#include <text.h>
+#include "util.h"
 #include "test.h"
 
 ///////////////////////////////////////////////////////////////////////////////
