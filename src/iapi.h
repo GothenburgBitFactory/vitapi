@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Tegelsten - building blocks for UI
+// VITapi - UI helper library that controls Visuals, Input and Terminals.
 //
 // Copyright 2010, Paul Beckingham, Federico Hernandez.
 // All rights reserved.
@@ -36,26 +36,26 @@
 #define IAPI_KEY_RIGHT     0403
 #define IAPI_KEY_BACKSPACE 0404
 
-#define IAPI_KEY_F1        0440
-#define IAPI_KEY_F2        0441
-#define IAPI_KEY_F3        0442
-#define IAPI_KEY_F4        0443
-#define IAPI_KEY_F5        0444
-#define IAPI_KEY_F6        0445
-#define IAPI_KEY_F7        0446
-#define IAPI_KEY_F8        0447
-#define IAPI_KEY_F9        0450
-#define IAPI_KEY_F10       0451
+#define IAPI_KEY_F1        0410
+#define IAPI_KEY_F2        0411
+#define IAPI_KEY_F3        0412
+#define IAPI_KEY_F4        0413
+#define IAPI_KEY_F5        0414
+#define IAPI_KEY_F6        0415
+#define IAPI_KEY_F7        0416
+#define IAPI_KEY_F8        0417
+#define IAPI_KEY_F9        0420
+#define IAPI_KEY_F10       0421
 
-#define IAPI_KEY_HOME      0452
-#define IAPI_KEY_DEL       0453
-#define IAPI_KEY_PGUP      0454
-#define IAPI_KEY_PGDN      0455
+#define IAPI_KEY_HOME      0422
+#define IAPI_KEY_DEL       0423
+#define IAPI_KEY_PGUP      0424
+#define IAPI_KEY_PGDN      0425
 
-#define IAPI_MOUSE_1_CLICK 0456
-#define IAPI_MOUSE_2_CLICK 0457
-#define IAPI_MOUSE_3_CLICK 0460
-#define IAPI_MOUSE_RELEASE 0461
+#define IAPI_MOUSE_1_CLICK 0426
+#define IAPI_MOUSE_2_CLICK 0427
+#define IAPI_MOUSE_3_CLICK 0430
+#define IAPI_MOUSE_RELEASE 0431
 
 #define IAPI_KEY_MAXIMUM   0500             // Highest value for synthetic key.
 
@@ -72,7 +72,6 @@ void iapi_noraw ();
 
 void iapi_mouse ();
 void iapi_nomouse ();
-
 void iapi_mouse_tracking ();
 void iapi_nomouse_tracking ();
 void iapi_mouse_pos (int&, int&);

@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Tegelsten - building blocks for UI
+// VITapi - UI helper library that controls Visuals, Input and Terminals.
 //
 // Copyright 2010, Paul Beckingham, Federico Hernandez.
 // All rights reserved.
