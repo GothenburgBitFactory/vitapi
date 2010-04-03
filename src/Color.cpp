@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
-// task - a command line task list manager.
+// VITapi - UI helper library that controls Visuals, Input and Terminals.
 //
-// Copyright 2006 - 2010, Paul Beckingham.
+// Copyright 2009 - 2010, Paul Beckingham, Federico Hernandez.
 // All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify it under
@@ -30,7 +30,7 @@
 #include <vector>
 #include <algorithm>
 #include "Color.h"
-#include "text.h"
+#include "util.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 static struct

@@ -3,7 +3,6 @@ include_directories (${CMAKE_SOURCE_DIR}/src)
 set (vitapi_SRCS Caps.cpp Caps.h
                  Color.cpp Color.h
                  iapi.cpp iapi.h
-                 text.cpp text.h
                  util.cpp util.h
                  vapi.cpp vapi.h)
-add_library (libvitapi STATIC ${vitapi_SRCS})
+add_library (vitapi STATIC ${vitapi_SRCS})

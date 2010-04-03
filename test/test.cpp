@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Tegelsten - building blocks for UI
+// VITapi - UI helper library that controls Visuals, Input and Terminals.
 //
-// Copyright 2010, Paul Beckingham, Federico Hernandez.
+// Copyright 2006 - 2010, Paul Beckingham, Federico Hernandez.
 // All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify it under
@@ -27,8 +27,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string.h>
-#include <util.h>
-#include <text.h>
+#include "util.h"
 #include "test.h"
 
 ///////////////////////////////////////////////////////////////////////////////

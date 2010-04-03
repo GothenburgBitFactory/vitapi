@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Tegelsten - building blocks for UI
+// VITapi - UI helper library that controls Visuals, Input and Terminals.
 //
-// Copyright 2010, Paul Beckingham, Federico Hernandez.
+// Copyright 2006 - 2010, Paul Beckingham, Federico Hernandez.
 // All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify it under
@@ -48,7 +48,11 @@ for (typeof (c) *foreach_p = & (c);                                \
        i != foreach_p->end();                                      \
        ++i)
 
-// util.cpp
+void split (std::vector<std::string>&, const std::string&, const char);
+std::string trimLeft (const std::string& in, const std::string& t = " ");
+std::string trimRight (const std::string& in, const std::string& t = " ");
+std::string trim (const std::string& in, const std::string& t = " ");
+std::string lowerCase (const std::string&);
 int autoComplete (const std::string&, const std::vector<std::string>&, std::vector<std::string>&);
 
 #endif

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
-// task - a command line task list manager.
+// VITapi - UI helper library that controls Visuals, Input and Terminals.
 //
-// Copyright 2006 - 2010, Paul Beckingham.
+// Copyright 2010, Paul Beckingham, Federico Hernandez.
 // All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify it under
@@ -88,6 +88,7 @@ void Caps::add (const std::string& term, const std::string& def)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Simply returns the cap string - may or may not be ready to use.
 std::string Caps::get (const std::string& key)
 {
   // TODO Lookup term
@@ -96,6 +97,7 @@ std::string Caps::get (const std::string& key)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Returns the cap string with [x,y] coordinate substitution, ready to use.
 std::string Caps::get (const std::string& key, int x, int y)
 {
   // TODO Lookup term
@@ -105,6 +107,7 @@ std::string Caps::get (const std::string& key, int x, int y)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Returns the cap string with string substitution, ready to use.
 std::string Caps::get (const std::string& key, const std::string& value)
 {
   // TODO Lookup term

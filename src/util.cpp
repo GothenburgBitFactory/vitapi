@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Tegelsten - building blocks for UI
+// VITapi - UI helper library that controls Visuals, Input and Terminals.
 //
-// Copyright 2010, Paul Beckingham, Federico Hernandez.
+// Copyright 2006 - 2010, Paul Beckingham, Federico Hernandez.
 // All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify it under
@@ -24,6 +24,8 @@
 //     USA
 //
 ////////////////////////////////////////////////////////////////////////////////
+//#include <strings.h>
+//#include <ctype.h>
 //#include <iostream>
 //#include <fstream>
 //#include <sstream>
@@ -34,6 +36,58 @@
 //#include <string.h>
 //#include <pwd.h>
 #include "util.h"
+
+
+////////////////////////////////////////////////////////////////////////////////
+void split (
+  std::vector<std::string>& results,
+  const std::string& input,
+  const char delimiter)
+{
+  results.clear ();
+  std::string::size_type start = 0;
+  std::string::size_type i;
+  while ((i = input.find (delimiter, start)) != std::string::npos)
+  {
+    results.push_back (input.substr (start, i - start));
+    start = i + 1;
+  }
+
+  if (input.length ())
+    results.push_back (input.substr (start));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string trimLeft (const std::string& in, const std::string& t /*= " "*/)
+{
+  std::string out = in;
+  return out.erase (0, in.find_first_not_of (t));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string trimRight (const std::string& in, const std::string& t /*= " "*/)
+{
+  std::string out = in;
+  return out.erase (out.find_last_not_of (t) + 1);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string trim (const std::string& in, const std::string& t /*= " "*/)
+{
+  std::string out = in;
+  return trimLeft (trimRight (out, t), t);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string lowerCase (const std::string& input)
+{
+  std::string output = input;
+  for (int i = 0; i < (int) input.length (); ++i)
+    if (isupper (input[i]))
+      output[i] = tolower (input[i]);
+
+  return output;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 int autoComplete (
