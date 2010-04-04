@@ -47,6 +47,14 @@ public:
   std::string get (const std::string&, const std::string&);
 
 private:
+  std::string lookup (const std::string&);
+  std::string decode (const std::string&);
+  std::string encode (const std::string&, int, int);
+  std::string encode (const std::string&, const std::string&);
+  std::string substitute (const std::string&, const std::string&, const std::string&);
+  std::string substitute (const std::string&, const std::string&, int);
+
+private:
   std::map <std::string, std::string> _data;
   std::string _term;
 };

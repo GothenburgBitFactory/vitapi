@@ -24,6 +24,7 @@
 //     USA
 //
 ////////////////////////////////////////////////////////////////////////////////
+#include <sstream>
 #include "Caps.h"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -82,6 +83,7 @@ bool Caps::initialize (const std::string& term /* = "" */)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// This is currently the only way to provide additional terminal types.
 void Caps::add (const std::string& term, const std::string& def)
 {
   _data[term] = def;
@@ -91,29 +93,96 @@ void Caps::add (const std::string& term, const std::string& def)
 // Simply returns the cap string - may or may not be ready to use.
 std::string Caps::get (const std::string& key)
 {
-  // TODO Lookup term
-  // TODO Default is xterm
-  // TODO Decode
+  return decode (lookup (key));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Returns the cap string with [x,y] coordinate substitution, ready to use.
 std::string Caps::get (const std::string& key, int x, int y)
 {
-  // TODO Lookup term
-  // TODO Default is xterm
-  // TODO Decode _E_, _B_
-  // TODO Encode _x_, _y_
+  return encode (decode (lookup (key)), x, y);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Returns the cap string with string substitution, ready to use.
 std::string Caps::get (const std::string& key, const std::string& value)
 {
-  // TODO Lookup term
-  // TODO Default is xterm
-  // TODO Decode _E_, _B_
-  // TODO Encode _s_
+  return encode (decode (lookup (key)), value);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string Caps::lookup (const std::string& key)
+{
+  std::string output;
+  std::map <std::string, std::string>::iterator t = _data.find (_term);
+  if (t != _data.end ())
+  {
+    std::string::size_type k = t->second.find (key);
+    if (k != std::string::npos)
+    {
+      std::string::size_type space = t->second.find (' ', k);
+      if (space != std::string::npos)
+        output = t->second.substr (k + key.length () + 1, space - k - key.length () - 1);
+      else
+        output = t->second.substr (k + key.length () + 1);
+    }
+  }
+
+  return output;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string Caps::decode (const std::string& input)
+{
+  return substitute (
+           substitute (input, "_E_", "\033"),
+           "_B_",
+           "\007");
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string Caps::encode (const std::string& input, int x, int y)
+{
+  return substitute (
+           substitute (input, "_x_", x),
+           "_y_",
+           y);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string Caps::encode (const std::string& input, const std::string& value)
+{
+  return substitute (input, "_s_", value);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string Caps::substitute (
+  const std::string& input,
+  const std::string& from,
+  const std::string& to)
+{
+  std::string::size_type it;
+  if ((it = input.find (from)) != std::string::npos)
+    return input.substr (0, it) + to + input.substr (it + from.length ());
+
+  return input;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string Caps::substitute (
+  const std::string& input,
+  const std::string& from,
+  int to)
+{
+  std::string::size_type it;
+  if ((it = input.find (from)) != std::string::npos)
+  {
+    std::stringstream temp;
+    temp << input.substr (0, it) << to << input.substr (it + from.length ());
+    return temp.str ();
+  }
+
+  return input;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

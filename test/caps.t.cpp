@@ -24,16 +24,22 @@
 //     USA
 //
 ////////////////////////////////////////////////////////////////////////////////
-#include <iostream>
 #include <Caps.h>
 #include <test.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 int main (int argc, char** argv)
 {
-  UnitTest t (1);
+  UnitTest t (4);
 
-  t.fail ("no tests yet");
+  Caps c;
+  c.initialize ("foo");
+  c.add ("foo", "a:_E_ b:_E__s__B_ c:_x_,_y_ d:bunny");
+
+  t.is (c.get ("a"),        "\033",        "_E_       -> \\033");
+  t.is (c.get ("b", "dog"), "\033dog\007", "_E__s__B_ -> \\033dog\\007");
+  t.is (c.get ("c", 1, 2),  "1,2",         "_x_,_y_   -> 1,2");
+  t.is (c.get ("d"),        "bunny",       "bunny     -> bunny");
 
   return 0;
 }
