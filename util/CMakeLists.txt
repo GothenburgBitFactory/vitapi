@@ -1,0 +1,5 @@
+cmake_minimum_required (VERSION 2.8)
+project (termdef)
+include_directories (${CMAKE_SOURCE_DIR}/src) 
+add_executable (termdef termdef.c)
+target_link_libraries(termdef ncurses)
