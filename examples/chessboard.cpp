@@ -47,6 +47,7 @@ int main (int argc, char** argv)
                       3,
                       ((row + col) % 2 == 0 ? black : white));
 
+  vapi_moveto (1, 1);
   vapi_refresh ();
   sleep (4);
   vapi_deinitialize ();
