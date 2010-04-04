@@ -69,15 +69,45 @@ Caps::~Caps ()
 //   _B_               <Bell>
 bool Caps::initialize (const std::string& term /* = "" */)
 {
-  _term = term;
+  _term = term != "" ? term : "xterm-256color";
 
-  _data["xterm"]          = "";
-  _data["xterm-color"]    = "";
-  _data["xterm-256color"] = "ku:_E_[OA kd:_E_[OB kr:_E_[OC kl:_E_[OD "
-                            "k1: k2: k3: k4: k5: k6: k7: k8: k9: k0: "
-                            "kH: kb: kD: kP: kN: AM:_E_[?1h NM:_E_[1l "
-                            "Ms1: Ms0: Mt1: Mt0: "
-                            "FS1: FS0: St: Mv: Alt: Ttl:";
+  _data["vt100"] = "";
+  _data["vt220"] = "";
+  _data["xterm"] = "";
+  _data["xterm-color"] = "";
+
+  _data["xterm-256color"] =
+    "ku:_E_OA "             // ku
+    "kd:_E_OB "             // kd
+    "kr:_E_OC "             // kr
+    "kl:_E_OD "             // kl
+    "k1:_E_OP "             // k1
+    "k2:_E_OQ "             // k2
+    "k3:_E_OR "             // k3
+    "k4:_E_OS "             // k4
+    "k5:_E_[15~ "           // k5
+    "k6:_E_[17~ "           // k6
+    "k7:_E_[18~ "           // k7
+    "k8:_E_[19~ "           // k8
+    "k9:_E_[20~ "           // k9
+    "k0: "                  // k0
+    "kH: "                  // kH
+    "kb:\010 "              // kb
+    "kD:_E_[3~ "            // kD
+    "kP:_E_[5~ "            // kP
+    "kN:_E_[6~ "            // kN
+    "AM:_E_[?1h "
+    "NM:_E_[?1l "
+    "Ms1:_E_[?1000h "
+    "Ms0:_E_[?1000l "
+    "Mt1:_E_[?1002h "
+    "Mt0:_E_[?1002l "
+    "ti:_E_[?1049h "        // ti
+    "te:_E_[?1049l "        // te
+    "hs: "                  // hs
+    "Mv:_E_[_y_;_x_H "
+    "Alt:_E_[1049h "
+    "Ttl:_E_]2;_s__B_";
 
   return true;
 }
@@ -111,6 +141,7 @@ std::string Caps::get (const std::string& key, const std::string& value)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Finds _term in _data, then locates the key within the definition.
 std::string Caps::lookup (const std::string& key)
 {
   std::string output;
@@ -132,6 +163,7 @@ std::string Caps::lookup (const std::string& key)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Converts "..._E_..." -> "...\033...".
 std::string Caps::decode (const std::string& input)
 {
   return substitute (
@@ -141,6 +173,7 @@ std::string Caps::decode (const std::string& input)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Converts "..._x_..._y_..." -> "...x...y...".
 std::string Caps::encode (const std::string& input, int x, int y)
 {
   return substitute (
@@ -150,12 +183,14 @@ std::string Caps::encode (const std::string& input, int x, int y)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Converts "..._s_..." -> "...value...".
 std::string Caps::encode (const std::string& input, const std::string& value)
 {
   return substitute (input, "_s_", value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Converts "...FROM..." -> "...TO...".
 std::string Caps::substitute (
   const std::string& input,
   const std::string& from,
@@ -169,6 +204,7 @@ std::string Caps::substitute (
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Converts "...FROM..." -> "...TO...".
 std::string Caps::substitute (
   const std::string& input,
   const std::string& from,

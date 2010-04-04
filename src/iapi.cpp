@@ -59,42 +59,6 @@ bool iapi_initialize ()
 {
   // Save the initial state for later restoration.
   tcgetattr (0, &tty);
-/*
-  std::cout << "# tty.c_iflag " << tty.c_iflag << std::endl;
-  if (tty.c_iflag & IGNBRK)  std::cout << "#   IGNBRK"  << std::endl;
-  if (tty.c_iflag & BRKINT)  std::cout << "#   BRKINT"  << std::endl;
-  if (tty.c_iflag & IGNPAR)  std::cout << "#   IGNPAR"  << std::endl;
-  if (tty.c_iflag & PARMRK)  std::cout << "#   PARMRK"  << std::endl;
-  if (tty.c_iflag & INPCK)   std::cout << "#   INPCK"   << std::endl;
-  if (tty.c_iflag & ISTRIP)  std::cout << "#   ISTRIP"  << std::endl;
-  if (tty.c_iflag & INLCR)   std::cout << "#   INCLR"   << std::endl;
-  if (tty.c_iflag & ICRNL)   std::cout << "#   ICRNL"   << std::endl;
-  if (tty.c_iflag & IXON)    std::cout << "#   IXON"    << std::endl;
-  if (tty.c_iflag & IXANY)   std::cout << "#   IXANY"   << std::endl;
-  if (tty.c_iflag & IXOFF)   std::cout << "#   IXOFF"   << std::endl;
-#ifndef HAIKU
-  if (tty.c_iflag & IMAXBEL) std::cout << "#   IMAXBEL" << std::endl;
-#endif
-
-  std::cout << "# tty.c_oflag " << tty.c_oflag << std::endl;
-  if (tty.c_oflag & OPOST)   std::cout << "#   OPOST"   << std::endl;
-  if (tty.c_oflag & ONLCR)   std::cout << "#   ONLCR"   << std::endl;
-  if (tty.c_oflag & OCRNL)   std::cout << "#   OCRNL"   << std::endl;
-  if (tty.c_oflag & ONOCR)   std::cout << "#   ONOCR"   << std::endl;
-  if (tty.c_oflag & ONLRET)  std::cout << "#   ONLRET"  << std::endl;
-
-  std::cout << "# tty.c_lflag " << tty.c_lflag << std::endl;
-  if (tty.c_lflag & ISIG)    std::cout << "#   ISIG"    << std::endl;
-  if (tty.c_lflag & ICANON)  std::cout << "#   ICANON"  << std::endl;
-  if (tty.c_lflag & NOFLSH)  std::cout << "#   NOFLSH"  << std::endl;
-#ifndef HAIKU
-  if (tty.c_lflag & FLUSHO)  std::cout << "#   FLUSHO"  << std::endl;
-  if (tty.c_lflag & PENDIN)  std::cout << "#   PENDIN"  << std::endl;
-#endif
-  if (tty.c_lflag & IEXTEN)  std::cout << "#   IEXTEN"  << std::endl;
-  if (tty.c_lflag & TOSTOP)  std::cout << "#   TOSTOP"  << std::endl;
-  if (tty.c_lflag & ECHO)    std::cout << "#   ECHO"    << std::endl;
-*/
 
 /*
   char* term = getenv ("TERM");
