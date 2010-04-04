@@ -38,6 +38,7 @@
 #include <errno.h>
 #include <termios.h>
 #include "iapi.h"
+#include "Caps.h"
 
 #ifdef SOLARIS
 #define CBREAK O_CBREAK
@@ -47,12 +48,12 @@
 static void translate (std::deque <int>&);
 static void translateMouse (std::deque <int>&);
 static bool same (const std::string&, const std::deque <int>&);
-static void assign (char*, int, const char*);
 
 ////////////////////////////////////////////////////////////////////////////////
 static struct termios tty;                    // Original I/O state.
 static std::map <int, std::string> sequences; // Key -> sequence mapping.
 static int mouse_x = -1, mouse_y = -1;        // Last known mouse position.
+static Caps caps;                             // Terminal capabilities.
 
 ////////////////////////////////////////////////////////////////////////////////
 bool iapi_initialize ()
@@ -60,49 +61,34 @@ bool iapi_initialize ()
   // Save the initial state for later restoration.
   tcgetattr (0, &tty);
 
-/*
   char* term = getenv ("TERM");
-  char buffer[2048];
-  if ((term && tgetent (buffer, term) > 0) ||
-      tgetent (buffer, "xterm-color") > 0  ||
-      tgetent (buffer, "xterm")       > 0  ||
-      tgetent (buffer, "vt100")       > 0)
+  if (term)
   {
-    char *bufp = buffer;
+    caps.initialize (term);
 
-    assign (bufp, IAPI_KEY_LEFT,      "kl");
-    assign (bufp, IAPI_KEY_RIGHT,     "kr");
-    assign (bufp, IAPI_KEY_UP,        "ku");
-    assign (bufp, IAPI_KEY_DOWN,      "kd");
-*/
-/*
-    sequences[IAPI_KEY_LEFT]          = "\033[D";
-    sequences[IAPI_KEY_RIGHT]         = "\033[C";
-    sequences[IAPI_KEY_UP]            = "\033[A";
-    sequences[IAPI_KEY_DOWN]          = "\033[B";
-*/
-/*
-    assign (bufp, IAPI_KEY_F1,        "k1");
-    assign (bufp, IAPI_KEY_F2,        "k2");
-    assign (bufp, IAPI_KEY_F3,        "k3");
-    assign (bufp, IAPI_KEY_F4,        "k4");
-    assign (bufp, IAPI_KEY_F5,        "k5");
-    assign (bufp, IAPI_KEY_F6,        "k6");
-    assign (bufp, IAPI_KEY_F7,        "k7");
-    assign (bufp, IAPI_KEY_F8,        "k8");
-    assign (bufp, IAPI_KEY_F9,        "k9");
-    assign (bufp, IAPI_KEY_F10,       "k0");
+    sequences[IAPI_KEY_UP]        = caps.get ("ku");
+    sequences[IAPI_KEY_DOWN]      = caps.get ("kd");
+    sequences[IAPI_KEY_RIGHT]     = caps.get ("kr");
+    sequences[IAPI_KEY_LEFT]      = caps.get ("kl");
+    sequences[IAPI_KEY_F1]        = caps.get ("k1");
+    sequences[IAPI_KEY_F2]        = caps.get ("k2");
+    sequences[IAPI_KEY_F3]        = caps.get ("k3");
+    sequences[IAPI_KEY_F4]        = caps.get ("k4");
+    sequences[IAPI_KEY_F5]        = caps.get ("k5");
+    sequences[IAPI_KEY_F6]        = caps.get ("k6");
+    sequences[IAPI_KEY_F7]        = caps.get ("k7");
+    sequences[IAPI_KEY_F8]        = caps.get ("k8");
+    sequences[IAPI_KEY_F9]        = caps.get ("k9");
+    sequences[IAPI_KEY_F10]       = caps.get ("k0");
+    sequences[IAPI_KEY_HOME]      = caps.get ("kH");
+    sequences[IAPI_KEY_BACKSPACE] = caps.get ("kb");
+    sequences[IAPI_KEY_DEL]       = caps.get ("kD");
+    sequences[IAPI_KEY_PGUP]      = caps.get ("kP");
+    sequences[IAPI_KEY_PGDN]      = caps.get ("kN");
 
-    assign (bufp, IAPI_KEY_HOME,      "kH");
-    assign (bufp, IAPI_KEY_BACKSPACE, "kb");
-    assign (bufp, IAPI_KEY_DEL,       "kD");
-    assign (bufp, IAPI_KEY_PGUP,      "kP");
-    assign (bufp, IAPI_KEY_PGDN,      "kN");
-
-    std::cout << "\033[?1h";          // Application cursor keys
+    std::cout << caps.get ("AM");        // Application mode.
     return true;
   }
-*/
 
   return false;
 }
@@ -110,7 +96,7 @@ bool iapi_initialize ()
 ////////////////////////////////////////////////////////////////////////////////
 void iapi_deinitialize ()
 {
-  std::cout << "\033[?1l";            // Normal cursor keys
+  std::cout << caps.get ("NM");          // Normal mode.
   tcsetattr (0, TCSANOW, &tty);
 }
 
@@ -155,13 +141,13 @@ void iapi_noraw ()
 // pressed.
 void iapi_mouse ()
 {
-  std::cout << "\033[?1000h" << std::flush;  // Mouse press & release
+  std::cout << caps.get ("Ms1") << std::flush;  // Mouse press & release
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void iapi_nomouse ()
 {
-  std::cout << "\033[?1000l";  // Mouse press & release
+  std::cout << caps.get ("Ms0");  // Mouse press & release
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -169,13 +155,13 @@ void iapi_nomouse ()
 // pressed.
 void iapi_mouse_tracking ()
 {
-  std::cout << "\033[?1002h" << std::flush;  // Cell motion tracking
+  std::cout << caps.get ("Mt1") << std::flush;  // Cell motion tracking
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void iapi_nomouse_tracking ()
 {
-  std::cout << "\033[?1002l";  // Cell motion tracking
+  std::cout << caps.get ("Mt0");  // Cell motion tracking
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -271,7 +257,8 @@ static void translate (std::deque <int>& sequence)
   std::map <int, std::string>::iterator it;
   for (it = sequences.begin (); it != sequences.end (); ++it)
   {
-    if (same (it->second, sequence))
+    if (it->second.length () > 0 &&   // Some sequences have zero length.
+        same (it->second, sequence))
     {
       std::deque <int> translated;
       translated.push_back (it->first);
@@ -363,15 +350,6 @@ static bool same (const std::string& known, const std::deque <int>& unknown)
       return false;
 
   return true;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-static void assign (char* buffer, int key, const char* name)
-{
-  // char* value = tgetstr ((char*) name, &buffer);
-  char* value;
-  if (value)
-    sequences[key] = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

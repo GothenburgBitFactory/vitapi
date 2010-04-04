@@ -54,9 +54,10 @@ Caps::~Caps ()
 //   Ms0:              mouse off
 //   Mt1:              mouse tracking on
 //   Mt0:              mouse tracking off
-//   FS1:              full screen on
-//   FS0:              full screen off
-//   St:               has status line
+//   ti:               full screen on
+//   te:               full screen off
+//   hs:               has status line
+//   cl:               clear screen
 //   Mv:               move to
 //   Alt:              alternate screen buffer
 //   Ttl:              window title
@@ -104,7 +105,8 @@ bool Caps::initialize (const std::string& term /* = "" */)
     "Mt0:_E_[?1002l "
     "ti:_E_[?1049h "        // ti
     "te:_E_[?1049l "        // te
-    "hs: "                  // hs
+    "hs:1 "                 // hs
+    "cl:_E_[_E_[2J "        // cl
     "Mv:_E_[_y_;_x_H "
     "Alt:_E_[1049h "
     "Ttl:_E_]2;_s__B_";
@@ -167,7 +169,10 @@ std::string Caps::lookup (const std::string& key)
 std::string Caps::decode (const std::string& input)
 {
   return substitute (
-           substitute (input, "_E_", "\033"),
+           substitute (
+             substitute (input, "_E_", "\033"),
+             "_E_",
+             "\033"),
            "_B_",
            "\007");
 }

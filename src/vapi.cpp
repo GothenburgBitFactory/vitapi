@@ -30,9 +30,9 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <sys/ioctl.h>
-//#include <ncurses.h>
 #include <term.h>
 #include "vapi.h"
+#include "Caps.h"
 
 #ifdef MIN
 #undef MIN
@@ -50,24 +50,26 @@ static char buffer [2048];
 
 static int screenWidth  = 0;     // Terminal width
 static int screenHeight = 0;     // Terminal height (may include status line)
-static char* ti_string  = NULL;  // Full screen mode
-static char* te_string  = NULL;  // End full screen mode
-static char* cl_string  = NULL;  // Clear screen
 static bool hs          = true;  // Has status line
 static bool full_screen = false; // Should deinitialize restore?
+static Caps caps;                // Terminal capabilities.
+
+////////////////////////////////////////////////////////////////////////////////
+static void getTerminalSize (int& w, int& h)
+{
+  unsigned short buff[4];
+  if (ioctl (0, TIOCGWINSZ, &buff) != -1)
+  {
+    screenHeight = buff[0];
+    screenWidth  = buff[1];
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 static void handler (int sig)
 {
   if (sig == SIGWINCH)
-  {
-    unsigned short buff[4];
-    if (ioctl (0, TIOCGWINSZ, &buff) != -1)
-    {
-      screenHeight = buff[0];
-      screenWidth  = buff[1];
-    }
-  }
+    getTerminalSize (screenWidth, screenHeight);
 
   // NOP for all other (trapped) signals.
 }
@@ -77,31 +79,22 @@ bool vapi_initialize ()
 {
   output.str ("");
 
+  getTerminalSize (screenWidth, screenHeight);
+
   char* term = getenv ("TERM");
   if (term)
   {
-/*
-    if (tgetent (buffer, term) > 0)
-    {
-      screenWidth  = tgetnum  ((char*) "co");
-      screenHeight = tgetnum  ((char*) "li");
+    caps.initialize (term);
 
-      char *bufp = buffer;
-      ti_string    = tgetstr  ((char*) "ti", &bufp);
-      te_string    = tgetstr  ((char*) "te", &bufp);
-      cl_string    = tgetstr  ((char*) "cl", &bufp);
+    hs = caps.get ("hs") != "" ? true : false;
 
-      hs           = tgetflag ((char*) "hs") != ERR ? true : false;
+    // Handle assorted signals.
+    signal (SIGWINCH, handler);
+    signal (SIGINT,   handler);
+    signal (SIGQUIT,  handler);
+    signal (SIGKILL,  handler);
 
-      // Handle assorted signals.
-      signal (SIGWINCH, handler);
-      signal (SIGINT,   handler);
-      signal (SIGQUIT,  handler);
-      signal (SIGKILL,  handler);
-
-      return true;
-    }
-*/
+    return true;
   }
 
   return false;
@@ -115,6 +108,9 @@ void vapi_deinitialize ()
 
   vapi_refresh ();
   signal (SIGWINCH, SIG_DFL);
+  signal (SIGINT,   SIG_DFL);
+  signal (SIGQUIT,  SIG_DFL);
+  signal (SIGKILL,  SIG_DFL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -133,33 +129,27 @@ bool vapi_refresh ()
 ////////////////////////////////////////////////////////////////////////////////
 void vapi_full_screen ()
 {
-  if (ti_string)
-    output << ti_string;
-
-  output << "\033[1049h";  // Alt screen
+  output << caps.get ("ti") << caps.get ("Alt");  // Alt screen
   full_screen = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void vapi_end_full_screen ()
 {
-  if (te_string)
-    output << te_string;
-
+  output << caps.get ("te");
   full_screen = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void vapi_clear ()
 {
-  if (cl_string)
-    output << cl_string;
+  output << caps.get ("cl");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void vapi_moveto (int x, int y)
 {
-  output << "\033[" << y << ";" << x << "H";
+  output << caps.get ("Mv", x, y);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -221,7 +211,7 @@ int vapi_height ()
 ////////////////////////////////////////////////////////////////////////////////
 void vapi_title (const std::string& title)
 {
-  output << "\033]2;" << title << "\007";
+  output << caps.get ("Ttl", title) << std::flush;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
