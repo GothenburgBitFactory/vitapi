@@ -7,7 +7,7 @@ build the binaries.
     $ make
     $ sudo make install
 
-You will need cmake installed in order to build the software, which is
-available from www.cmake.org.
+You will need cmake (www.cmake.org) installed in order to build the software.
+You'll like it.
 
 ---
