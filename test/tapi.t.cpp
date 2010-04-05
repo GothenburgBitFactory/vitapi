@@ -24,22 +24,31 @@
 //     USA
 //
 ////////////////////////////////////////////////////////////////////////////////
-#include <Caps.h>
+#include <vitapi.h>
 #include <test.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 int main (int argc, char** argv)
 {
-  UnitTest t (4);
+  UnitTest t (6);
 
-  Caps c;
-  c.initialize ("foo");
-  c.add ("foo", "a:_E_ b:_E__s__B_ c:_x_,_y_ d:bunny");
+  t.is (tapi_initialize ("xterm-256color"),  0, "tapi_initialize xterm-256color good");
+  t.is (tapi_initialize ("foo"),            -1, "tapi_initialize foo bad");
 
-  t.is (c.get ("a"),        "\033",        "_E_       -> \\033");
-  t.is (c.get ("b", "dog"), "\033dog\007", "_E__s__B_ -> \\033dog\\007");
-  t.is (c.get ("c", 1, 2),  "1,2",         "_x_,_y_   -> 1,2");
-  t.is (c.get ("d"),        "bunny",       "bunny     -> bunny");
+  tapi_add ("foo", "a:_E_ b:_E__s__B_ c:_x_,_y_ d:bunny");
+
+  char value[64];
+  tapi_get ("a", value);
+  t.is (value, "\033", "_E_ -> \\033");
+
+  tapi_get_str ("b", value, "dog");
+  t.is (value, "\033dog\007", "_E__s__B_ -> \\033dog\\007");
+
+  tapi_get_xy ("c", value, 1, 2);
+  t.is (value, "1,2", "_x_,_y_ -> 1,2");
+
+  tapi_get ("d", value);
+  t.is (value, "bunny", "bunny -> bunny");
 
   return 0;
 }
