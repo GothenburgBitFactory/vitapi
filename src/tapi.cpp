@@ -28,6 +28,7 @@
 #include <map>
 #include <string>
 #include <sstream>
+#include <string.h>
 #include <vitapi.h>
 
 static std::string current_term;

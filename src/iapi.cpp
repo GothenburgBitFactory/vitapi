@@ -29,13 +29,11 @@
 #include <map>
 #include <deque>
 #include <string>
+#include <stdio.h>
 #include <stdlib.h>
 #include <termios.h>
 #include <sys/select.h>
 #include <sys/ioctl.h>
-//#include <stdio.h>
-//#include <string.h>
-//#include <term.h>
 
 #ifdef SOLARIS
 #define CBREAK O_CBREAK
