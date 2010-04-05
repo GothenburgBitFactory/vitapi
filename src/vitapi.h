@@ -56,7 +56,7 @@
 
 #define IAPI_KEY_MAXIMUM   0431         // Highest value for synthetic key
 
-#ifdef __cplusplus__
+#ifdef __cplusplus
 extern "C"
 {
 #endif
@@ -74,14 +74,16 @@ extern "C"
 #define _COLOR_DEFAULT   0              // Terminal default colors
 
 // color - 16- and 256-color support
-typedef unsigned int color;
+typedef int color;
 
 color color_def (const char*);          // Parse definition: "red on white"
 void  color_name (char*, int, color);   // Convert a color -> description
 color color_upgrade (color);            // Convert 16- to 256-color
 color color_downgrade (color);          // Convert 256- to 16-color, with loss
-color color_blend (color);              // Blend two colors, possible upgrade
-void  color_colorize (char*, int);      // Colorize a string
+color color_blend (color, color);       // Blend two colors, possible upgrade
+void  color_colorize (char*, int, color);
+                                        // Colorize a string
+void  color_error (char*, int);         // Obtain last error
 
 // iapi - input processing API
 int  iapi_initialize ();                // Initialize for processed input
@@ -106,9 +108,11 @@ void vapi_end_full_screen ();           // End use of full screen
 void vapi_clear ();                     // Clear the screen
 void vapi_moveto (int, int);            // Move cursor
 void vapi_text (const char*);           // Draw text at cursor
-void vapi_text (color, const char*);    // Draw colored text at cursor
-void vapi_text (int, int, const char*); // Draw text at position
-void vapi_text (int, int, color, const char*);
+void vapi_color_text (color, const char*);
+                                        // Draw colored text at cursor
+void vapi_pos_text (int, int, const char*);
+                                        // Draw text at position
+void vapi_pos_color_text (int, int, color, const char*);
                                         // Draw colored text at position
 void vapi_rectangle (int, int, int, int, color);
                                         // Draw a colored rectangle
@@ -126,7 +130,7 @@ void tapi_get_xy (const char*, char*, int, int);
 void tapi_get_str (const char*, char*, const char*);
                                         // Get control string with string subst
 
-#ifdef __cplusplus__
+#ifdef __cplusplus
 };
 #endif
 
