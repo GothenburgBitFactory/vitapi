@@ -94,7 +94,7 @@ void iapi_mouse ();                     // Enable mouse clicks
 void iapi_nomouse ();                   // Disable mouse clicks
 void iapi_mouse_tracking ();            // Enable mouse clicks and tracking
 void iapi_nomouse_tracking ();          // Disable mouse clicks and tracking
-void iapi_mouse_pos (int*, int*);       / / Get last known mouse position
+void iapi_mouse_pos (int*, int*);       // Get last known mouse position
 int  iapi_getch ();                     // Get processed input
 
 // vapi - visual primitives API
