@@ -34,7 +34,7 @@
 #include <sys/ttold.h>
 #endif
 
-#include "iapi.h"
+#include <vitapi.h>
 
 int main (int argc, char** argv)
 {
@@ -55,7 +55,7 @@ int main (int argc, char** argv)
     if (key == 'q')
       break;
 
-    iapi_mouse_pos (x, y); // Get mouse position, just in case.
+    iapi_mouse_pos (&x, &y); // Get mouse position, just in case.
 
     switch (key)
     {

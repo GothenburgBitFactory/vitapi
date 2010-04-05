@@ -25,32 +25,44 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "vapi.h"
+#include <iostream>
+#include <stdlib.h>
+#include <unistd.h>
+#include <vitapi.h>
 
 int main (int argc, char** argv)
 {
-  vapi_initialize ();
-  vapi_full_screen ();
-  vapi_clear ();
+  if (! vapi_initialize ())
+  {
+    vapi_full_screen ();
+    vapi_clear ();
 
-  Color black ("on bright black");
-  Color white ("on bright white");
+    color black = color_def ("on bright black");
+    color white = color_def ("on bright white");
+    std::cout << black << std::endl << white << std::endl;
 
-  int origin_x = (vapi_width ()  - 8 * 3 * 2) / 2;
-  int origin_y = (vapi_height () - 8 * 3)     / 2;
+    int origin_x = (vapi_width ()  - 8 * 3 * 2) / 2;
+    int origin_y = (vapi_height () - 8 * 3)     / 2;
 
-  for (int row = 0; row < 8; row++)
-    for (int col = 0; col < 8; col++)
-      vapi_rectangle (origin_x + (col * 3 * 2),
-                      origin_y + (row * 3),
-                      3 * 2,
-                      3,
-                      ((row + col) % 2 == 0 ? black : white));
+    for (int row = 0; row < 8; row++)
+      for (int col = 0; col < 8; col++)
+        vapi_rectangle (origin_x + (col * 3 * 2),
+                        origin_y + (row * 3),
+                        3 * 2,
+                        3,
+                        ((row + col) % 2 == 0 ? black : white));
 
-  vapi_moveto (1, 1);
-  vapi_refresh ();
-  sleep (4);
-  vapi_deinitialize ();
+    vapi_moveto (1, 1);
+    vapi_refresh ();
+    sleep (4);
+    vapi_deinitialize ();
+  }
+  else
+    std::cout << "Your $TERM ("
+              << getenv ("TERM")
+              << ") is not supported."
+              << std::endl;
+
   return 0;
 }
 

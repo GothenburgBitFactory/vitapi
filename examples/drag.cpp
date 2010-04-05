@@ -30,8 +30,7 @@
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
-#include "vapi.h"
-#include "iapi.h"
+#include <vitapi.h>
 
 #define MIN(a,b) (a)<(b)?(a):(b)
 #define MAX(a,b) (a)>(b)?(a):(b)
@@ -39,77 +38,84 @@
 int main (int argc, char** argv)
 {
   // VAPI up.
-  vapi_initialize ();
-  vapi_full_screen ();
-  vapi_clear ();
-
-  // IAPI up.
-  iapi_initialize ();
-  iapi_raw ();
-  iapi_noecho ();
-  iapi_mouse_tracking ();
-
-  // Draw a rectangle.
-  Color c ("black on bright yellow");
-  int r_x = 1;
-  int r_y = 1;
-  int r_width = 10;
-  int r_height = 3;
-  vapi_rectangle (r_x, r_y, r_width, r_height, c);
-  vapi_text (r_x + 1, r_y + 1, c, "Drag me.");
-
-  int width  = vapi_width ();
-  int height = vapi_height ();
-
-  vapi_text ((width - 17) / 2, height / 2, "Press 'q' to quit");
-  vapi_moveto (1, 1);
-  vapi_refresh ();
-
-  // Event loop.
-  bool dragging = false;
-  int key;
-  while ((key = iapi_getch ()) != EOF)
+  if (! vapi_initialize ())
   {
-    if (key == 'q')
-      break;
+    vapi_full_screen ();
+    vapi_clear ();
 
-    else if (key == IAPI_MOUSE_1_CLICK)
+    // IAPI up.
+    iapi_initialize ();
+    iapi_raw ();
+    iapi_noecho ();
+    iapi_mouse_tracking ();
+
+    // Draw a rectangle.
+    color c = color_def ("black on bright yellow");
+    int r_x = 1;
+    int r_y = 1;
+    int r_width = 10;
+    int r_height = 3;
+    vapi_rectangle (r_x, r_y, r_width, r_height, c);
+    vapi_pos_color_text (r_x + 1, r_y + 1, c, "Drag me.");
+
+    int width  = vapi_width ();
+    int height = vapi_height ();
+
+    vapi_pos_text ((width - 17) / 2, height / 2, "Press 'q' to quit");
+    vapi_moveto (1, 1);
+    vapi_refresh ();
+
+    // Event loop.
+    bool dragging = false;
+    int key;
+    while ((key = iapi_getch ()) != EOF)
     {
-      int x, y;
-      iapi_mouse_pos (x, y);
+      if (key == 'q')
+        break;
 
-      if (dragging)
+      else if (key == IAPI_MOUSE_1_CLICK)
       {
-        r_x = MAX (1, MIN (x, width  - r_width + 1));
-        r_y = MAX (1, MIN (y, height - r_height));
+        int x, y;
+        iapi_mouse_pos (&x, &y);
 
-        vapi_clear ();
-        vapi_text ((width - 17) / 2, height / 2, "Press 'q' to quit");
-        vapi_rectangle (r_x, r_y, r_width, r_height, c);
-        vapi_text (r_x + 1, r_y + 1, c, "Drag me.");
-        vapi_moveto (1, 1);
-        vapi_refresh ();
+        if (dragging)
+        {
+          r_x = MAX (1, MIN (x, width  - r_width + 1));
+          r_y = MAX (1, MIN (y, height - r_height));
+
+          vapi_clear ();
+          vapi_pos_text ((width - 17) / 2, height / 2, "Press 'q' to quit");
+          vapi_rectangle (r_x, r_y, r_width, r_height, c);
+          vapi_pos_color_text (r_x + 1, r_y + 1, c, "Drag me.");
+          vapi_moveto (1, 1);
+          vapi_refresh ();
+        }
+        else
+        {
+          if (x > r_x && x < r_x + width && y > r_y && y < r_y + height)
+            dragging = true;
+        }
       }
-      else
-      {
-        if (x > r_x && x < r_x + width && y > r_y && y < r_y + height)
-          dragging = true;
-      }
+
+      else if (key == IAPI_MOUSE_RELEASE)
+        dragging = false;
     }
 
-    else if (key == IAPI_MOUSE_RELEASE)
-      dragging = false;
+    // IAPI down.
+    iapi_nomouse_tracking ();
+    iapi_noraw ();
+    iapi_echo ();
+    iapi_deinitialize ();
+
+    // VAPI down.
+    vapi_end_full_screen ();
+    vapi_deinitialize ();
   }
-
-  // IAPI down.
-  iapi_nomouse_tracking ();
-  iapi_noraw ();
-  iapi_echo ();
-  iapi_deinitialize ();
-
-  // VAPI down.
-  vapi_end_full_screen ();
-  vapi_deinitialize ();
+  else
+    std::cout << "Your $TERM ("
+              << getenv ("TERM")
+              << ") is not supported."
+              << std::endl;
 
   return 0;
 }

@@ -26,45 +26,50 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
-#include <sstream>
-#include <string>
-#include <stdio.h>
 #include <stdlib.h>
-#include "vapi.h"
+#include <vitapi.h>
 
 int main (int argc, char** argv)
 {
-  vapi_initialize ();
-  vapi_full_screen ();
-
-  int width  = vapi_width ();
-  int height = vapi_height ();
-
-  Color palette[] =
+  if (! vapi_initialize ())
   {
-    Color ("white on black"),
-    Color ("white on red"),
-    Color ("white on blue"),
-    Color ("white on green"),
-    Color ("black on magenta"),
-    Color ("black on cyan"),
-    Color ("black on yellow"),
-    Color ("black on white")
-  };
+    vapi_full_screen ();
 
-  for (int i = 0; i < 1000; ++i)
-  {
-    vapi_text ((rand () % (width - 8)) + 1, (rand () % (height - 1)) + 1, palette [rand () % 8], "VAPIVAPI");
-    vapi_refresh ();
+    int width  = vapi_width ();
+    int height = vapi_height ();
+
+    color palette[] =
+    {
+      color_def ("white on black"),
+      color_def ("white on red"),
+      color_def ("white on blue"),
+      color_def ("white on green"),
+      color_def ("black on magenta"),
+      color_def ("black on cyan"),
+      color_def ("black on yellow"),
+      color_def ("black on white")
+    };
+
+    for (int i = 0; i < 1000; ++i)
+    {
+      vapi_pos_color_text ((rand () % (width - 8)) + 1, (rand () % (height - 1)) + 1, palette [rand () % 8], "VAPIVAPI");
+      vapi_refresh ();
+    }
+
+    for (int i = 0; i < 1000; ++i)
+    {
+      vapi_rectangle ((rand () % (width - 8)) + 1, (rand () % (height - 4)) + 1, 8, 4, palette [rand () % 8]);
+      vapi_refresh ();
+    }
+
+    vapi_deinitialize ();
   }
+  else
+    std::cout << "Your $TERM ("
+              << getenv ("TERM")
+              << ") is not supported."
+              << std::endl;
 
-  for (int i = 0; i < 1000; ++i)
-  {
-    vapi_rectangle ((rand () % (width - 8)) + 1, (rand () % (height - 4)) + 1, 8, 4, palette [rand () % 8]);
-    vapi_refresh ();
-  }
-
-  vapi_deinitialize ();
   return 0;
 }
 

@@ -56,11 +56,6 @@
 
 #define IAPI_KEY_MAXIMUM   0431         // Highest value for synthetic key
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 // color - color API
 #define _COLOR_256       0x00200000     // 256-color mode
 #define _COLOR_HASBG     0x00100000     // Has background color set
@@ -72,6 +67,11 @@ extern "C"
 #define _COLOR_FG        0x000000FF     // 8-bit foreground color mask
 
 #define _COLOR_DEFAULT   0              // Terminal default colors
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 // color - 16- and 256-color support
 typedef int color;
