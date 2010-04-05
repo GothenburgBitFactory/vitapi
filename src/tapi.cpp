@@ -24,18 +24,21 @@
 //     USA
 //
 ////////////////////////////////////////////////////////////////////////////////
+
+#include <map>
+#include <string>
 #include <sstream>
-#include "Caps.h"
+#include <vitapi.h>
 
-////////////////////////////////////////////////////////////////////////////////
-Caps::Caps ()
-{
-}
+static std::string current_term;
+static std::map <std::string, std::string> data;
 
-////////////////////////////////////////////////////////////////////////////////
-Caps::~Caps ()
-{
-}
+static std::string lookup (const std::string&);
+static std::string decode (const std::string&);
+static std::string encode (const std::string&, int, int);
+static std::string encode (const std::string&, const std::string&);
+static std::string substitute (const std::string&, const std::string&, const std::string&);
+static std::string substitute (const std::string&, const std::string&, int);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input
@@ -68,16 +71,16 @@ Caps::~Caps ()
 //   _y_               row
 //   _s_               string
 //   _B_               <Bell>
-bool Caps::initialize (const std::string& term /* = "" */)
+extern "C" int tapi_initialize (const char* term)
 {
-  _term = term != "" ? term : "xterm-256color";
+  current_term = strcmp (term, "") ? term : "xterm-256color";
 
-  _data["vt100"] = "";
-  _data["vt220"] = "";
-  _data["xterm"] = "";
-  _data["xterm-color"] = "";
+  //data["vt100"] = "";       // TODO Missing def
+  //data["vt220"] = "";       // TODO Missing def
+  //data["xterm"] = "";       // TODO Missing def
+  //data["xterm-color"] = ""; // TODO Missing def
 
-  _data["xterm-256color"] =
+  data["xterm-256color"] =
     "ku:_E_OA "             // ku
     "kd:_E_OB "             // kd
     "kr:_E_OC "             // kr
@@ -111,44 +114,51 @@ bool Caps::initialize (const std::string& term /* = "" */)
     "Alt:_E_[1049h "
     "Ttl:_E_]2;_s__B_";
 
-  return true;
+  // Error if term is not supported.
+  if (data.find (term) == data.end ())
+    return -1;
+
+  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // This is currently the only way to provide additional terminal types.
-void Caps::add (const std::string& term, const std::string& def)
+extern "C" void tapi_add (const char* term, const char* def)
 {
-  _data[term] = def;
+  data[term] = def;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Simply returns the cap string - may or may not be ready to use.
-std::string Caps::get (const std::string& key)
+// Simply returns the control string - may or may not be ready to use.
+extern "C" void tapi_get (const char* key, char* value)
 {
-  return decode (lookup (key));
+  std::string s = decode (lookup (key));
+  strcpy (value, s.c_str ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Returns the cap string with [x,y] coordinate substitution, ready to use.
-std::string Caps::get (const std::string& key, int x, int y)
+// Returns the control string with [x,y] coordinate substitution, ready to use.
+extern "C" void tapi_get_xy (const char* key, char* value, int x, int y)
 {
-  return encode (decode (lookup (key)), x, y);
+  std::string s = encode (decode (lookup (key)), x, y);
+  strcpy (value, s.c_str ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Returns the cap string with string substitution, ready to use.
-std::string Caps::get (const std::string& key, const std::string& value)
+// Returns the control string with string substitution, ready to use.
+extern "C" void tapi_get_str (const char* key, char* value, const char* str)
 {
-  return encode (decode (lookup (key)), value);
+  std::string s = encode (decode (lookup (key)), str);
+  strcpy (value, s.c_str ());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Finds _term in _data, then locates the key within the definition.
-std::string Caps::lookup (const std::string& key)
+// Finds current_term in data, then locates the key within the definition.
+static std::string lookup (const std::string& key)
 {
   std::string output;
-  std::map <std::string, std::string>::iterator t = _data.find (_term);
-  if (t != _data.end ())
+  std::map <std::string, std::string>::iterator t = data.find (current_term);
+  if (t != data.end ())
   {
     std::string::size_type k = t->second.find (key);
     if (k != std::string::npos)
@@ -166,7 +176,8 @@ std::string Caps::lookup (const std::string& key)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Converts "..._E_..." -> "...\033...".
-std::string Caps::decode (const std::string& input)
+// TODO Support more than 2 _E_ substitutions.
+static std::string decode (const std::string& input)
 {
   return substitute (
            substitute (
@@ -179,7 +190,7 @@ std::string Caps::decode (const std::string& input)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Converts "..._x_..._y_..." -> "...x...y...".
-std::string Caps::encode (const std::string& input, int x, int y)
+static std::string encode (const std::string& input, int x, int y)
 {
   return substitute (
            substitute (input, "_x_", x),
@@ -189,14 +200,14 @@ std::string Caps::encode (const std::string& input, int x, int y)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Converts "..._s_..." -> "...value...".
-std::string Caps::encode (const std::string& input, const std::string& value)
+static std::string encode (const std::string& input, const std::string& value)
 {
   return substitute (input, "_s_", value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Converts "...FROM..." -> "...TO...".
-std::string Caps::substitute (
+static std::string substitute (
   const std::string& input,
   const std::string& from,
   const std::string& to)
@@ -210,7 +221,7 @@ std::string Caps::substitute (
 
 ////////////////////////////////////////////////////////////////////////////////
 // Converts "...FROM..." -> "...TO...".
-std::string Caps::substitute (
+static std::string substitute (
   const std::string& input,
   const std::string& from,
   int to)

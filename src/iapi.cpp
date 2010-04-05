@@ -29,34 +29,32 @@
 #include <map>
 #include <deque>
 #include <string>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <term.h>
+#include <termios.h>
 #include <sys/select.h>
 #include <sys/ioctl.h>
-#include <errno.h>
-#include <termios.h>
-#include "iapi.h"
-#include "Caps.h"
+//#include <stdio.h>
+//#include <string.h>
+//#include <term.h>
 
 #ifdef SOLARIS
 #define CBREAK O_CBREAK
 #include <sys/ttold.h>
 #endif
 
+#include <vitapi.h>
+
+static struct termios tty;                    // Original I/O state.
+static std::map <int, std::string> sequences; // Key -> sequence mapping.
+static int mouse_x = -1, mouse_y = -1;        // Last known mouse position.
+
 static void translate (std::deque <int>&);
 static void translateMouse (std::deque <int>&);
 static bool same (const std::string&, const std::deque <int>&);
 
 ////////////////////////////////////////////////////////////////////////////////
-static struct termios tty;                    // Original I/O state.
-static std::map <int, std::string> sequences; // Key -> sequence mapping.
-static int mouse_x = -1, mouse_y = -1;        // Last known mouse position.
-static Caps caps;                             // Terminal capabilities.
-
-////////////////////////////////////////////////////////////////////////////////
-bool iapi_initialize ()
+// Initialize for processed input
+extern "C" int iapi_initialize ()
 {
   // Save the initial state for later restoration.
   tcgetattr (0, &tty);
@@ -64,44 +62,52 @@ bool iapi_initialize ()
   char* term = getenv ("TERM");
   if (term)
   {
-    caps.initialize (term);
+    if (! tapi_initialize (term))
+    {
+      char value[64];
+      tapi_get ("ku", value);   sequences[IAPI_KEY_UP]        = value;
+      tapi_get ("kd", value);   sequences[IAPI_KEY_DOWN]      = value;
+      tapi_get ("kr", value);   sequences[IAPI_KEY_RIGHT]     = value;
+      tapi_get ("kl", value);   sequences[IAPI_KEY_LEFT]      = value;
+      tapi_get ("k1", value);   sequences[IAPI_KEY_F1]        = value;
+      tapi_get ("k2", value);   sequences[IAPI_KEY_F2]        = value;
+      tapi_get ("k3", value);   sequences[IAPI_KEY_F3]        = value;
+      tapi_get ("k4", value);   sequences[IAPI_KEY_F4]        = value;
+      tapi_get ("k5", value);   sequences[IAPI_KEY_F5]        = value;
+      tapi_get ("k6", value);   sequences[IAPI_KEY_F6]        = value;
+      tapi_get ("k7", value);   sequences[IAPI_KEY_F7]        = value;
+      tapi_get ("k8", value);   sequences[IAPI_KEY_F8]        = value;
+      tapi_get ("k9", value);   sequences[IAPI_KEY_F9]        = value;
+      tapi_get ("k0", value);   sequences[IAPI_KEY_F10]       = value;
+      tapi_get ("kH", value);   sequences[IAPI_KEY_HOME]      = value;
+      tapi_get ("kb", value);   sequences[IAPI_KEY_BACKSPACE] = value;
+      tapi_get ("kD", value);   sequences[IAPI_KEY_DEL]       = value;
+      tapi_get ("kP", value);   sequences[IAPI_KEY_PGUP]      = value;
+      tapi_get ("kN", value);   sequences[IAPI_KEY_PGDN]      = value;
 
-    sequences[IAPI_KEY_UP]        = caps.get ("ku");
-    sequences[IAPI_KEY_DOWN]      = caps.get ("kd");
-    sequences[IAPI_KEY_RIGHT]     = caps.get ("kr");
-    sequences[IAPI_KEY_LEFT]      = caps.get ("kl");
-    sequences[IAPI_KEY_F1]        = caps.get ("k1");
-    sequences[IAPI_KEY_F2]        = caps.get ("k2");
-    sequences[IAPI_KEY_F3]        = caps.get ("k3");
-    sequences[IAPI_KEY_F4]        = caps.get ("k4");
-    sequences[IAPI_KEY_F5]        = caps.get ("k5");
-    sequences[IAPI_KEY_F6]        = caps.get ("k6");
-    sequences[IAPI_KEY_F7]        = caps.get ("k7");
-    sequences[IAPI_KEY_F8]        = caps.get ("k8");
-    sequences[IAPI_KEY_F9]        = caps.get ("k9");
-    sequences[IAPI_KEY_F10]       = caps.get ("k0");
-    sequences[IAPI_KEY_HOME]      = caps.get ("kH");
-    sequences[IAPI_KEY_BACKSPACE] = caps.get ("kb");
-    sequences[IAPI_KEY_DEL]       = caps.get ("kD");
-    sequences[IAPI_KEY_PGUP]      = caps.get ("kP");
-    sequences[IAPI_KEY_PGDN]      = caps.get ("kN");
-
-    std::cout << caps.get ("AM");        // Application mode.
-    return true;
+      tapi_get ("AM", value);
+      std::cout << value;        // Application mode.
+      return 0;
+    }
   }
 
-  return false;
+  return -1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void iapi_deinitialize ()
+// End of processed input
+extern "C" void iapi_deinitialize ()
 {
-  std::cout << caps.get ("NM");          // Normal mode.
-  tcsetattr (0, TCSANOW, &tty);
+  char value[64];
+  tapi_get ("NM", value);
+  std::cout << value;            // Normal mode.
+
+  tcsetattr (0, TCSANOW, &tty);  // Restore initial state.
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void iapi_echo ()
+// Enable echo
+extern "C" void iapi_echo ()
 {
   struct termios tmp;
   tcgetattr (0, &tmp);
@@ -110,7 +116,8 @@ void iapi_echo ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void iapi_noecho ()
+// Disable echo
+extern "C" void iapi_noecho ()
 {
   struct termios tmp;
   tcgetattr (0, &tmp);
@@ -119,7 +126,8 @@ void iapi_noecho ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void iapi_raw ()
+// Enable raw mode
+extern "C" void iapi_raw ()
 {
   struct termios tmp;
   tcgetattr (0, &tmp);
@@ -128,7 +136,8 @@ void iapi_raw ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void iapi_noraw ()
+// Disable raw mode
+extern "C" void iapi_noraw ()
 {
   struct termios tmp;
   tcgetattr (0, &tmp);
@@ -137,38 +146,51 @@ void iapi_noraw ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Without the std::flush, no mouse events are received, unless a key is
+// Enable mouse clicks
+// Note: Without the std::flush, no mouse events are received, until a key is
 // pressed.
-void iapi_mouse ()
+extern "C" void iapi_mouse ()
 {
-  std::cout << caps.get ("Ms1") << std::flush;  // Mouse press & release
+  char value[64];
+  tapi_get ("Ms1", value);
+  std::cout << value << std::flush;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void iapi_nomouse ()
+// Disable mouse clicks
+extern "C" void iapi_nomouse ()
 {
-  std::cout << caps.get ("Ms0");  // Mouse press & release
+  char value[64];
+  tapi_get ("Ms0", value);
+  std::cout << value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Without the std::flush, no mouse events are received, unless a key is
+// Enable mouse clicks and tracking
+// Note: Without the std::flush, no mouse events are received, until a key is
 // pressed.
-void iapi_mouse_tracking ()
+extern "C" void iapi_mouse_tracking ()
 {
-  std::cout << caps.get ("Mt1") << std::flush;  // Cell motion tracking
+  char value[64];
+  tapi_get ("Mt1", value);
+  std::cout << value << std::flush;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void iapi_nomouse_tracking ()
+// Disable mouse clicks and tracking
+extern "C" void iapi_nomouse_tracking ()
 {
-  std::cout << caps.get ("Mt0");  // Cell motion tracking
+  char value[64];
+  tapi_get ("Mt0", value);
+  std::cout << value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void iapi_mouse_pos (int& x, int& y)
+// Get last known mouse position
+extern "C" void iapi_mouse_pos (int* x, int* y)
 {
-  x = mouse_x;
-  y = mouse_y;
+  *x = mouse_x;
+  *y = mouse_y;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -201,7 +223,7 @@ void iapi_mouse_pos (int& x, int& y)
 // 5. Return the first key press, and append any residual keys to the overflow
 //    buffer.
 //
-int iapi_getch ()
+extern "C" int iapi_getch ()
 {
   // An 'ungetchar' buffer for sequences that were read, but not recognized.
   // This buffer should be depleted before calling getchar again.
