@@ -27,6 +27,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <test.h>
+#include <string.h>
 #include <vitapi.h>
 
 ////////////////////////////////////////////////////////////////////////////////
