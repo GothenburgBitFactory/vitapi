@@ -86,25 +86,39 @@ int main (int argc, char** argv)
   color_name (value, 256, c);
   t.is (value, "color4 on color0", "color1 on color0 + blue -> color4 on color0");
 
-/*
   // Now the dumb show of every color and its code.
-  t.is (Color::colorize ("foo", "red"),                std::string ("\033[31mfoo\033[0m"),       "red                -> ^[[31m");
-  t.is (Color::colorize ("foo", "bold red"),           std::string ("\033[1;31mfoo\033[0m"),     "bold red           -> ^[[1;31m");
-  t.is (Color::colorize ("foo", "underline red"),      std::string ("\033[4;31mfoo\033[0m"),     "underline red      -> ^[[4;31m");
-  t.is (Color::colorize ("foo", "underline bold red"), std::string ("\033[1;4;31mfoo\033[0m"),   "underline bold red -> ^[[1;4;31m");
+  strcpy (value, "foo"); color_colorize (value, 256, color_def ("red"));
+  t.is (value, "\033[31mfoo\033[0m",     "red                  -> ^[[31m");
+  strcpy (value, "foo"); color_colorize (value, 256, color_def ("bold red"));
+  t.is (value, "\033[1;31mfoo\033[0m",   "bold red             -> ^[[1;31m");
+  strcpy (value, "foo"); color_colorize (value, 256, color_def ("underline red"));
+  t.is (value, "\033[4;31mfoo\033[0m",   "underline red        -> ^[[4;31m");
+  strcpy (value, "foo"); color_colorize (value, 256, color_def ("underline bold red"));
+  t.is (value, "\033[1;4;31mfoo\033[0m", "underline bold red   -> ^[[1;4;31m");
 
   // 16-color foregrounds.
-  t.is (Color::colorize ("foo", ""),                   std::string ("foo"),                      "''                 -> ''");
+  strcpy (value, "foo"); color_colorize (value, 256, color_def (""));
+  t.is (value, "foo",                    "''                   -> ^[[31m");
 
-  t.is (Color::colorize ("foo", "black"),              std::string ("\033[30mfoo\033[0m"),       "black              -> ^[[30m");
-  t.is (Color::colorize ("foo", "red"),                std::string ("\033[31mfoo\033[0m"),       "red                -> ^[[31m");
-  t.is (Color::colorize ("foo", "green"),              std::string ("\033[32mfoo\033[0m"),       "green              -> ^[[32m");
-  t.is (Color::colorize ("foo", "yellow"),             std::string ("\033[33mfoo\033[0m"),       "yellow             -> ^[[33m");
-  t.is (Color::colorize ("foo", "blue"),               std::string ("\033[34mfoo\033[0m"),       "blue               -> ^[[34m");
-  t.is (Color::colorize ("foo", "magenta"),            std::string ("\033[35mfoo\033[0m"),       "magenta            -> ^[[35m");
-  t.is (Color::colorize ("foo", "cyan"),               std::string ("\033[36mfoo\033[0m"),       "cyan               -> ^[[36m");
-  t.is (Color::colorize ("foo", "white"),              std::string ("\033[37mfoo\033[0m"),       "white              -> ^[[37m");
+  strcpy (value, "foo"); color_colorize (value, 256, color_def ("black"));
+  t.is (value, "\033[30mfoo\033[0m",     "black                -> ^[[30m");
+  strcpy (value, "foo"); color_colorize (value, 256, color_def ("red"));
+  t.is (value, "\033[31mfoo\033[0m",     "red                  -> ^[[31m");
+  strcpy (value, "foo"); color_colorize (value, 256, color_def ("green"));
+  t.is (value, "\033[32mfoo\033[0m",     "green                -> ^[[32m");
+  strcpy (value, "foo"); color_colorize (value, 256, color_def ("yellow"));
+  t.is (value, "\033[33mfoo\033[0m",     "yellow               -> ^[[33m");
+  strcpy (value, "foo"); color_colorize (value, 256, color_def ("blue"));
+  t.is (value, "\033[34mfoo\033[0m",     "blue                 -> ^[[34m");
+  strcpy (value, "foo"); color_colorize (value, 256, color_def ("magenta"));
+  t.is (value, "\033[35mfoo\033[0m",     "magenta              -> ^[[35m");
+  strcpy (value, "foo"); color_colorize (value, 256, color_def ("cyan"));
+  t.is (value, "\033[36mfoo\033[0m",     "cyan                 -> ^[[36m");
+  strcpy (value, "foo"); color_colorize (value, 256, color_def ("white"));
+  t.is (value, "\033[37mfoo\033[0m",     "white                -> ^[[37m");
 
+
+/*
   // 16-color backgrounds.
   t.is (Color::colorize ("foo", "on bright black"),    std::string ("\033[100mfoo\033[0m"),      "on bright black    -> ^[[100m");
 
