@@ -212,7 +212,7 @@ extern "C" color color_def (const char* def)
   }
 
   // Now combine the fg and bg into a single color.
-  c = color_blend (fg_value, bg_value);
+  return c = color_blend (fg_value, bg_value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
