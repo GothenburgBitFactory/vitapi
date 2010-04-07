@@ -33,18 +33,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 int main (int argc, char** argv)
 {
-  UnitTest t (1033);
-
-  // Names matched to values.
-//  t.is ((int) Color (""),        (int) Color (Color::nocolor), "''        == Color::nocolor");
-//  t.is ((int) Color ("black"),   (int) Color (Color::black),   "'black'   == Color::black");
-//  t.is ((int) Color ("red"),     (int) Color (Color::red),     "'red'     == Color::red");
-//  t.is ((int) Color ("green"),   (int) Color (Color::green),   "'green'   == Color::green");
-//  t.is ((int) Color ("yellow"),  (int) Color (Color::yellow),  "'yellow'  == Color::yellow");
-//  t.is ((int) Color ("blue"),    (int) Color (Color::blue),    "'blue'    == Color::blue");
-//  t.is ((int) Color ("magenta"), (int) Color (Color::magenta), "'magenta' == Color::magenta");
-//  t.is ((int) Color ("cyan"),    (int) Color (Color::cyan),    "'cyan'    == Color::cyan");
-//  t.is ((int) Color ("white"),   (int) Color (Color::white),   "'white'   == Color::white");
+  UnitTest t (1024);
 
   // Auto upgrades.
   char value [256];
@@ -119,18 +108,26 @@ int main (int argc, char** argv)
   t.is (value, "\033[37mfoo\033[0m",     "white                -> ^[[37m");
 
 
-/*
   // 16-color backgrounds.
-  t.is (Color::colorize ("foo", "on bright black"),    std::string ("\033[100mfoo\033[0m"),      "on bright black    -> ^[[100m");
+  strcpy (value, "foo"); color_colorize (value, 256, color_def ("on bright black"));
+  t.is (value, "\033[100mfoo\033[0m",    "on bright black      -> ^[[100m");
 
-  t.is (Color::colorize ("foo", "on black"),           std::string ("\033[40mfoo\033[0m"),       "on black           -> ^[[40m");
-  t.is (Color::colorize ("foo", "on red"),             std::string ("\033[41mfoo\033[0m"),       "on red             -> ^[[41m");
-  t.is (Color::colorize ("foo", "on green"),           std::string ("\033[42mfoo\033[0m"),       "on green           -> ^[[42m");
-  t.is (Color::colorize ("foo", "on yellow"),          std::string ("\033[43mfoo\033[0m"),       "on yellow          -> ^[[43m");
-  t.is (Color::colorize ("foo", "on blue"),            std::string ("\033[44mfoo\033[0m"),       "on blue            -> ^[[44m");
-  t.is (Color::colorize ("foo", "on magenta"),         std::string ("\033[45mfoo\033[0m"),       "on magenta         -> ^[[45m");
-  t.is (Color::colorize ("foo", "on cyan"),            std::string ("\033[46mfoo\033[0m"),       "on cyan            -> ^[[46m");
-  t.is (Color::colorize ("foo", "on white"),           std::string ("\033[47mfoo\033[0m"),       "on white           -> ^[[47m");
+  strcpy (value, "foo"); color_colorize (value, 256, color_def ("on black"));
+  t.is (value, "\033[40mfoo\033[0m",     "on black             -> ^[[40m");
+  strcpy (value, "foo"); color_colorize (value, 256, color_def ("on red"));
+  t.is (value, "\033[41mfoo\033[0m",     "on red               -> ^[[41m");
+  strcpy (value, "foo"); color_colorize (value, 256, color_def ("on green"));
+  t.is (value, "\033[42mfoo\033[0m",     "on green             -> ^[[42m");
+  strcpy (value, "foo"); color_colorize (value, 256, color_def ("on yellow"));
+  t.is (value, "\033[43mfoo\033[0m",     "on yellow            -> ^[[43m");
+  strcpy (value, "foo"); color_colorize (value, 256, color_def ("on blue"));
+  t.is (value, "\033[44mfoo\033[0m",     "on blue              -> ^[[44m");
+  strcpy (value, "foo"); color_colorize (value, 256, color_def ("on magenta"));
+  t.is (value, "\033[45mfoo\033[0m",     "on magenta           -> ^[[45m");
+  strcpy (value, "foo"); color_colorize (value, 256, color_def ("on cyan"));
+  t.is (value, "\033[46mfoo\033[0m",     "on cyan              -> ^[[46m");
+  strcpy (value, "foo"); color_colorize (value, 256, color_def ("on white"));
+  t.is (value, "\033[47mfoo\033[0m",     "on white             -> ^[[47m");
 
   // 256-color, basic colors.
   char color [24];
@@ -142,7 +139,9 @@ int main (int argc, char** argv)
     sprintf (codes,       "\033[38;5;%dmfoo\033[0m", i);
     sprintf (description, "color%d -> ^[[38;5;%dm", i, i);
 
-    t.is (Color::colorize ("foo", color), std::string (codes), description);
+    strcpy (value, "foo");
+    color_colorize (value, 256, color_def (color));
+    t.is (value, codes, description);
   }
 
   for (int i = 0; i < 256; ++i)
@@ -151,7 +150,9 @@ int main (int argc, char** argv)
     sprintf (codes,       "\033[48;5;%dmfoo\033[0m", i);
     sprintf (description, "on color%d -> ^[[48;5;%dm", i, i);
 
-    t.is (Color::colorize ("foo", color), std::string (codes), description);
+    strcpy (value, "foo");
+    color_colorize (value, 256, color_def (color));
+    t.is (value, codes, description);
   }
 
   // RGB Color Cube.
@@ -164,7 +165,9 @@ int main (int argc, char** argv)
         sprintf (codes,       "\033[38;5;%dmfoo\033[0m", code);
         sprintf (description, "rgb%d%d%d -> ^[[38;5;%dm", r, g, b, code);
 
-        t.is (Color::colorize ("foo", color), std::string (codes), description);
+        strcpy (value, "foo");
+        color_colorize (value, 256, color_def (color));
+        t.is (value, codes, description);
       }
 
   for (int r = 0; r < 6; ++r)
@@ -176,12 +179,16 @@ int main (int argc, char** argv)
         sprintf (codes,       "\033[48;5;%dmfoo\033[0m", code);
         sprintf (description, "on rgb%d%d%d -> ^[[48;5;%dm", r, g, b, code);
 
-        t.is (Color::colorize ("foo", color), std::string (codes), description);
+        strcpy (value, "foo");
+        color_colorize (value, 256, color_def (color));
+        t.is (value, codes, description);
       }
 
   // 256-color, grays.
   // grey == gray.
-  t.is (Color::colorize ("foo", "grey0"), std::string ("\033[38;5;232mfoo\033[0m"), "grey0 -> ^[[38;5;232m");
+  strcpy (value, "foo");
+  color_colorize (value, 256, color_def ("grey0"));
+  t.is (value, "\033[38;5;232mfoo\033[0m", description);
 
   for (int i = 0; i < 24; ++i)
   {
@@ -189,7 +196,9 @@ int main (int argc, char** argv)
     sprintf (codes,       "\033[38;5;%dmfoo\033[0m", i + 232);
     sprintf (description, "gray%d -> ^[[38;5;%dm", i + 232, i + 232);
 
-    t.is (Color::colorize ("foo", color), std::string (codes), description);
+    strcpy (value, "foo");
+    color_colorize (value, 256, color_def (color));
+    t.is (value, codes, description);
   }
 
   for (int i = 0; i < 24; ++i)
@@ -198,9 +207,10 @@ int main (int argc, char** argv)
     sprintf (codes,       "\033[48;5;%dmfoo\033[0m", i + 232);
     sprintf (description, "on gray%d -> ^[[48;5;%dm", i + 232, i + 232);
 
-    t.is (Color::colorize ("foo", color), std::string (codes), description);
+    strcpy (value, "foo");
+    color_colorize (value, 256, color_def (color));
+    t.is (value, codes, description);
   }
-*/
 
   return 0;
 }
