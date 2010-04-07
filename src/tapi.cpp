@@ -78,7 +78,6 @@ extern "C" int tapi_initialize (const char* term)
 
   //data["vt100"] = "";       // TODO Missing def
   //data["vt220"] = "";       // TODO Missing def
-  //data["xterm"] = "";       // TODO Missing def
   //data["xterm-color"] = ""; // TODO Missing def
 
   data["xterm-256color"] =
@@ -114,6 +113,8 @@ extern "C" int tapi_initialize (const char* term)
     "Mv:_E_[_y_;_x_H "
     "Alt:_E_[1049h "
     "Ttl:_E_]2;_s__B_";
+
+  data["xterm"] = data["xterm-256color"];
 
   // Error if term is not supported.
   if (data.find (term) == data.end ())
