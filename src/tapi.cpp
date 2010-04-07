@@ -177,16 +177,14 @@ static std::string lookup (const std::string& key)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Converts "..._E_..." -> "...\033...".
-// TODO Support more than 2 _E_ substitutions.
 static std::string decode (const std::string& input)
 {
-  return substitute (
-           substitute (
-             substitute (input, "_E_", "\033"),
-             "_E_",
-             "\033"),
-           "_B_",
-           "\007");
+  std::string output = input;
+
+  while (output.find ("_E_") != std::string::npos)
+    output = substitute (output, "_E_", "\033");
+
+  return substitute (output, "_B_", "\007");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
