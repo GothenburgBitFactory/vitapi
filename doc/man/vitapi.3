@@ -1,0 +1,63 @@
+.TH vitapi 3 2010-04-07 "vitapi 0.8.0" "Library Functions Manual"
+
+.SH NAME
+vitapi \- A library providing support for terminals, input and visuals.
+
+.SH Library
+.B libvitapi.a (-lvitapi)
+
+.SH SYNOPSIS
+.B #include <vitapi.h>
+
+color
+.B color_def
+(const char*);
+void
+.B color_name
+(char*, size_t, color);
+color
+.B color_upgrade
+(color);
+color
+.B color_downgrade
+(color);
+color
+.B color_blend
+(color, color);
+void
+.B color_colorize
+(char*, size_t, color);
+
+
+.SH DESCRIPTION
+
+.SH EXAMPLES
+
+.SH ERRORS
+
+.SH "CREDITS & COPYRIGHTS"
+Vitapi was written by P. Beckingham <paul@beckingham.net>, F. Hernandez <ultrafredde@gmail.com>.
+.br
+Copyright (C) 2010, P. Beckingham, F. Hernandez
+
+Vitapi is distributed under the GNU General Public License.  See
+http://www.gnu.org/licenses/gpl-2.0.txt for more information.
+
+For more information regarding vitapi, the following may be referenced:
+
+.TP
+The official site at
+<http://vitapi.org>
+
+.TP
+The official code repository at
+<git://tasktools.org/vitapi.git/>
+
+.TP
+You can contact the project by writing an email to
+<support@vitapi.org>
+
+.SH REPORTING BUGS
+.TP
+Bugs in task may be reported to the issue-tracker at
+<http://taskwarrior.org>
