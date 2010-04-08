@@ -28,6 +28,8 @@
 #ifndef INCLUDED_VITAPI
 #define INCLUDED_VITAPI
 
+#include <stdio.h>                      // For size_t
+
 #define IAPI_KEY_MINIMUM   0400         // Lowest value for synthetic key
 
 #define IAPI_KEY_UP        0400
@@ -76,59 +78,61 @@ extern "C"
 // color - 16- and 256-color support
 typedef int color;
 
-color color_def (const char*);          // Parse definition: "red on white"
-void  color_name (char*, int, color);   // Convert a color -> description
-color color_upgrade (color);            // Convert 16- to 256-color
-color color_downgrade (color);          // Convert 256- to 16-color, with loss
-color color_blend (color, color);       // Blend two colors, possible upgrade
-void  color_colorize (char*, int, color);
-                                        // Colorize a string
-void  color_error (char*, int);         // Obtain last error
+color color_def (const char*);           // Parse definition: "red on white"
+void  color_name (char*, size_t, color); // Convert a color -> description
+color color_upgrade (color);             // Convert 16- to 256-color
+color color_downgrade (color);           // Convert 256- to 16-color, with loss
+color color_blend (color, color);        // Blend two colors, possible upgrade
+void  color_colorize (char*, size_t, color);
+                                         // Colorize a string
 
 // iapi - input processing API
-int  iapi_initialize ();                // Initialize for processed input
-void iapi_deinitialize ();              // End of processed input
-void iapi_echo ();                      // Enable echo
-void iapi_noecho ();                    // Disable echo
-void iapi_raw ();                       // Enable raw mode
-void iapi_noraw ();                     // Disable raw mode
-void iapi_mouse ();                     // Enable mouse clicks
-void iapi_nomouse ();                   // Disable mouse clicks
-void iapi_mouse_tracking ();            // Enable mouse clicks and tracking
-void iapi_nomouse_tracking ();          // Disable mouse clicks and tracking
-void iapi_mouse_pos (int*, int*);       // Get last known mouse position
-int  iapi_getch ();                     // Get processed input
+int  iapi_initialize ();                 // Initialize for processed input
+void iapi_deinitialize ();               // End of processed input
+void iapi_echo ();                       // Enable echo
+void iapi_noecho ();                     // Disable echo
+void iapi_raw ();                        // Enable raw mode
+void iapi_noraw ();                      // Disable raw mode
+void iapi_mouse ();                      // Enable mouse clicks
+void iapi_nomouse ();                    // Disable mouse clicks
+void iapi_mouse_tracking ();             // Enable mouse clicks and tracking
+void iapi_nomouse_tracking ();           // Disable mouse clicks and tracking
+void iapi_mouse_pos (int*, int*);        // Get last known mouse position
+int  iapi_getch ();                      // Get processed input
 
 // vapi - visual primitives API
-int  vapi_initialize ();                // Initialize visual processing
-void vapi_deinitialize ();              // End of visual processing
-int  vapi_refresh ();                   // Update the display
-void vapi_full_screen ();               // Use the full screen
-void vapi_end_full_screen ();           // End use of full screen
-void vapi_clear ();                     // Clear the screen
-void vapi_moveto (int, int);            // Move cursor
-void vapi_text (const char*);           // Draw text at cursor
+int  vapi_initialize ();                 // Initialize visual processing
+void vapi_deinitialize ();               // End of visual processing
+int  vapi_refresh ();                    // Update the display
+void vapi_full_screen ();                // Use the full screen
+void vapi_end_full_screen ();            // End use of full screen
+void vapi_clear ();                      // Clear the screen
+void vapi_moveto (int, int);             // Move cursor
+void vapi_text (const char*);            // Draw text at cursor
 void vapi_color_text (color, const char*);
-                                        // Draw colored text at cursor
+                                         // Draw colored text at cursor
 void vapi_pos_text (int, int, const char*);
-                                        // Draw text at position
+                                         // Draw text at position
 void vapi_pos_color_text (int, int, color, const char*);
-                                        // Draw colored text at position
+                                         // Draw colored text at position
 void vapi_rectangle (int, int, int, int, color);
-                                        // Draw a colored rectangle
-int  vapi_width ();                     // Get the terminal width
-int  vapi_height ();                    // Get the terminal height
-void vapi_title (const char*);          // Set the terminal title
+                                         // Draw a colored rectangle
+int  vapi_width ();                      // Get the terminal width
+int  vapi_height ();                     // Get the terminal height
+void vapi_title (const char*);           // Set the terminal title
 
 // tapi - terminal API
-int  tapi_initialize (const char*);     // Initialize terminal caps
+int  tapi_initialize (const char*);      // Initialize terminal caps
 void tapi_add (const char*, const char*);
-                                        // Provide new terminal configuration
-void tapi_get (const char*, char*);     // Get control string
+                                         // Provide new terminal configuration
+void tapi_get (const char*, char*);      // Get control string
 void tapi_get_xy (const char*, char*, int, int);
-                                        // Get control string with x,y subst
+                                         // Get control string with x,y subst
 void tapi_get_str (const char*, char*, const char*);
-                                        // Get control string with string subst
+                                         // Get control string with string subst
+
+// error messages.
+int vitapi_error (char*, size_t);        // Obtain last error
 
 #ifdef __cplusplus
 };

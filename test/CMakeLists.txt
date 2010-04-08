@@ -3,4 +3,5 @@ add_executable (tapi.t tapi.t.cpp test.cpp)
 target_link_libraries (tapi.t vitapi)
 add_executable (color.t color.t.cpp test.cpp)
 target_link_libraries (color.t vitapi)
-
+add_executable (error.t error.t.cpp test.cpp)
+target_link_libraries (error.t vitapi)

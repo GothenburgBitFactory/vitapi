@@ -36,16 +36,8 @@
 static std::string error;
 static char color_names[][16] =
 {
-  "none",    // 0
-  "black",   // 1
-  "red",     // 2
-  "green",   // 3
-  "yellow",  // 4
-  "blue",    // 5
-  "magenta", // 6
-  "cyan",    // 7
-  "white",   // 8
-  "",
+  //   0        1      2        3         4       5          6       7        8
+  "none", "black", "red", "green", "yellow", "blue", "magenta", "cyan", "white", ""
 };
 
 #define NUM_COLORS (sizeof (color_names) / sizeof (color_names[0]))
@@ -53,6 +45,8 @@ static char color_names[][16] =
 static int color_index (const std::string&);
 static std::string color_fg (color);
 static std::string color_bg (color);
+
+void vitapi_set_error (const std::string&);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Supports the following constructs:
@@ -68,6 +62,12 @@ static std::string color_bg (color);
 //   rgbRGB 0 <= R,G,B <= 5    fg 38;5;16 + R*36 + G*6 + B  bg 48;5;16 + R*36 + G*6 + B
 extern "C" color color_def (const char* def)
 {
+  if (!def)
+  {
+    vitapi_set_error ("Null pointer to a color definition passed to color_def.");
+    return -1;
+  }
+
   // The color that is being constructed.
   color c = 0;
 
@@ -122,7 +122,7 @@ extern "C" color color_def (const char* def)
       index = atoi (word.substr (4).c_str ());
       if (index < 0 || index > 23)
       {
-        error = "The color '" + *it + "' is not recognized.";
+        vitapi_set_error ("The color '" + *it + "' is not recognized.");
         return -1;
       }
 
@@ -147,7 +147,7 @@ extern "C" color color_def (const char* def)
       if (word.length () != 6 ||
           index < 0 || index > 555)
       {
-        error = "The color '" + *it + "' is not recognized.";
+        vitapi_set_error ("The color '" + *it + "' is not recognized.");
         return -1;
       }
 
@@ -158,7 +158,7 @@ extern "C" color color_def (const char* def)
           g < 0 || g > 5 ||
           b < 0 || b > 5)
       {
-        error = "The color '" + *it + "' is not recognized.";
+        vitapi_set_error ("The color '" + *it + "' is not recognized.");
         return -1;
       }
 
@@ -184,7 +184,7 @@ extern "C" color color_def (const char* def)
       index = atoi (word.substr (5).c_str ());
       if (index < 0 || index > 255)
       {
-        error = "The color '" + *it + "' is not recognized.";
+        vitapi_set_error ("The color '" + *it + "' is not recognized.");
         return -1;
       }
 
@@ -206,7 +206,7 @@ extern "C" color color_def (const char* def)
     }
     else if (word != "")
     {
-      error = "The color '" + *it + "' is not recognized.";
+      vitapi_set_error ("The color '" + *it + "' is not recognized.");
       return -1;
     }
   }
@@ -217,8 +217,20 @@ extern "C" color color_def (const char* def)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Convert a color -> description
-extern "C" void color_name (char* buf, int size, color c)
+extern "C" void color_name (char* buf, size_t size, color c)
 {
+  if (!buf)
+  {
+    vitapi_set_error ("Null buffer pointer passed to color_name.");
+    return;
+  }
+
+  if (c == -1)
+  {
+    vitapi_set_error ("Invalid color passed to color_name.");
+    return;
+  }
+
   std::string description;
   if (c & _COLOR_BOLD) description += "bold";
 
@@ -238,6 +250,12 @@ extern "C" void color_name (char* buf, int size, color c)
     description += " " + color_bg (c);
   }
 
+  if (description.length () + 1 >= size)
+  {
+    vitapi_set_error ("Insufficient buffer size passed to color_name.");
+    return;
+  }
+
   strncpy (buf, description.c_str (), size);
 }
 
@@ -245,6 +263,12 @@ extern "C" void color_name (char* buf, int size, color c)
 // Convert 16- to 256-color
 extern "C" color color_upgrade (color c)
 {
+  if (c == -1)
+  {
+    vitapi_set_error ("Invalid color passed to color_name.");
+    return -1;
+  }
+
   if (!(c & _COLOR_256))
   {
     if (c & _COLOR_HASFG)
@@ -275,7 +299,7 @@ extern "C" color color_upgrade (color c)
 // Convert 256- to 16-color, with loss
 extern "C" color color_downgrade (color)
 {
-  error = "color_downgrade is not implemented.";
+  vitapi_set_error ("color_downgrade is not implemented.");
   return -1;
 }
 
@@ -284,6 +308,16 @@ extern "C" color color_downgrade (color)
 // compatible, merge them into 'one'.  Colors in 'two' take precedence.
 extern "C" color color_blend (color one, color two)
 {
+  // Cannot blend bad colors.
+  if (one == -1 && two == -1)
+  {
+    vitapi_set_error ("Two invalid colors passed to color_blend.");
+    return -1;
+  }
+
+  if (one == -1) return two;          // if one is bad, result -> two
+  if (two == -1) return one;          // if two is bad, result -> one
+
   one |= (two & _COLOR_UNDERLINE);    // Always inherit underline.
 
   // 16 <-- 16.
@@ -344,8 +378,14 @@ extern "C" color color_blend (color one, color two)
 //
 //   256 fg               \033[38;5;Nm
 //   256 bg               \033[48;5;Nm
-extern "C" void color_colorize (char* buf, int size, color c)
+extern "C" void color_colorize (char* buf, size_t size, color c)
 {
+  if (!buf)
+  {
+    vitapi_set_error ("Null buffer pointer passed to color_colorize.");
+    return;
+  }
+
   int count = 0;
   std::stringstream result;
 
@@ -413,14 +453,13 @@ extern "C" void color_colorize (char* buf, int size, color c)
   else
     result << buf;
 
-  strncpy (buf, result.str ().c_str (), size);
-}
+  if (result.str ().size () + 1 >= size)
+  {
+    vitapi_set_error ("Insufficient buffer size passed to color_colorize.");
+    return;
+  }
 
-////////////////////////////////////////////////////////////////////////////////
-// Return most recent error.
-extern "C" void color_error (char* buf, int size)
-{
-  strncpy (buf, error.c_str (), size);
+  strncpy (buf, result.str ().c_str (), size);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
