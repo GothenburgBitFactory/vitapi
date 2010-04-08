@@ -9,11 +9,13 @@ New Features in vitapi 0.1
 Vitapi has been built and tested on the following configurations:
 
   * OS X 10.6 Snow Leopard
-  * Ubuntu 9.10 Karmic Koala
+  * Ubuntu  9.10 Karmic Koala
+  * Ubuntu 10.04 Lucid Lynx
 
 and with the following $TERM values:
 
   * xterm-256color
+  * xterm
 
 While Vitapi has undergone testing, bugs are sure to remain.  If you
 encounter a bug, please send a message to:
