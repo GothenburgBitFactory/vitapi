@@ -76,45 +76,79 @@ extern "C" int tapi_initialize (const char* term)
 {
   current_term = strcmp (term, "") ? term : "xterm-256color";
 
+  // Settings that are common to all terminals.
+  std::string app_mode    = "AM:_E_[?1h ";
+  std::string normal_mode = "NM:_E_[?1l ";
+  std::string mouse       = "Ms1:_E_[?1000h Ms0:_E_[?1000l Mt1:_E_[?1002h Mt0:_E_[?1002l ";
+  std::string move        = "Mv:_E_[_y_;_x_H ";
+  std::string alternate   = "Alt:_E_[1049h ";
+  std::string title       = "Ttl:_E_]2;_s__B_";   // No trailing space, so last.
+
+  // Now the terminal-specific settings.
+
   //data["vt100"] = "";       // TODO Missing def
   //data["vt220"] = "";       // TODO Missing def
   //data["xterm-color"] = ""; // TODO Missing def
 
-  data["xterm-256color"] =
-    "ku:_E_OA "             // ku
-    "kd:_E_OB "             // kd
-    "kr:_E_OC "             // kr
-    "kl:_E_OD "             // kl
-    "k1:_E_OP "             // k1
-    "k2:_E_OQ "             // k2
-    "k3:_E_OR "             // k3
-    "k4:_E_OS "             // k4
-    "k5:_E_[15~ "           // k5
-    "k6:_E_[17~ "           // k6
-    "k7:_E_[18~ "           // k7
-    "k8:_E_[19~ "           // k8
-    "k9:_E_[20~ "           // k9
-    "k0: "                  // k0
-    "kH: "                  // kH
-    "kb:\010 "              // kb
-    "kD:_E_[3~ "            // kD
-    "kP:_E_[5~ "            // kP
-    "kN:_E_[6~ "            // kN
-    "AM:_E_[?1h "
-    "NM:_E_[?1l "
-    "Ms1:_E_[?1000h "
-    "Ms0:_E_[?1000l "
-    "Mt1:_E_[?1002h "
-    "Mt0:_E_[?1002l "
-    "ti:_E_[?1049h "        // ti
-    "te:_E_[?1049l "        // te
-    "hs:1 "                 // hs
-    "cl:_E_[_E_[2J "        // cl
-    "Mv:_E_[_y_;_x_H "
-    "Alt:_E_[1049h "
-    "Ttl:_E_]2;_s__B_";
+  data["xterm"] = data["xterm-256color"] =
+    "ku:_E_OA "
+    "kd:_E_OB "
+    "kr:_E_OC "
+    "kl:_E_OD "
+    "k1:_E_OP "
+    "k2:_E_OQ "
+    "k3:_E_OR "
+    "k4:_E_OS "
+    "k5:_E_[15~ "
+    "k6:_E_[17~ "
+    "k7:_E_[18~ "
+    "k8:_E_[19~ "
+    "k9:_E_[20~ "
+    "k0: "
+    "kH: "
+    "kb:\010 "
+    "kD:_E_[3~ "
+    "kP:_E_[5~ "
+    "kN:_E_[6~ "
+    "ti:_E_[?1049h "
+    "te:_E_[?1049l "
+    "hs:1 "
+    "cl:_E_[_E_[2J "
+    + app_mode
+    + normal_mode
+    + mouse
+    + move
+    + alternate
+    + title;
 
-  data["xterm"] = data["xterm-256color"];
+
+  data["rxvt"] = data["rxvt-unicode"] =
+    "ku:_E_OA "
+    "kd:_E_OB "
+    "kr:_E_OC "
+    "kl:_E_OD "
+    "k1:_E_[11~ "
+    "k2:_E_[12~ "
+    "k3:_E_[13~ "
+    "k4:_E_[14~ "
+    "k5:_E_[15~ "
+    "k6:_E_[17~ "
+    "k7:_E_[18~ "
+    "k8:_E_[19~ "
+    "k9:_E_[20~ "
+    "kb:127 "
+    "kD:_E_[3~ "
+    "kP:_E_[5~ "
+    "kN:_E_[6~ "
+    "ti:_E_[?1049h "
+    "te:_E_[r_E_[?1049l "
+    "cl:_E_[H_E_[2J "
+    + app_mode
+    + normal_mode
+    + mouse
+    + move
+    + alternate
+    + title;
 
   // Error if term is not supported.
   if (data.find (term) == data.end ())
