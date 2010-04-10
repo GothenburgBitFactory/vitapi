@@ -35,8 +35,8 @@
 #include <check.h>
 
 static std::stringstream output; // Output buffer
-static int screenWidth  = 0;     // Terminal width
-static int screenHeight = 0;     // Terminal height (may include status line)
+static int screenWidth  = 80;    // Terminal width
+static int screenHeight = 24;    // Terminal height (may include status line)
 static bool full_screen = false; // Should deinitialize restore?
 static bool has_status  = false; // Terminal has status area
 
@@ -179,8 +179,8 @@ extern "C" void vapi_color_text (color c, const char* text)
 // TODO Text placement should be cropped.
 extern "C" void vapi_pos_text (int x, int y, const char* text)
 {
-  CHECKX0 (x,    "Invalid x coordinate passed to vapi_moveto.");
-  CHECKY0 (y,    "Invalid y coordinate passed to vapi_moveto.");
+  CHECKX0 (x,    "Invalid x coordinate passed to vapi_pos_text.");
+  CHECKY0 (y,    "Invalid y coordinate passed to vapi_pos_text.");
   CHECK0  (text, "Null pointer passed to vapi_pos_text.");
 
   vapi_moveto (x, y);
@@ -192,10 +192,10 @@ extern "C" void vapi_pos_text (int x, int y, const char* text)
 // TODO Text placement should be cropped.
 extern "C" void vapi_pos_color_text (int x, int y, color c, const char* text)
 {
-  CHECKX0 (x,    "Invalid x coordinate passed to vapi_moveto.");
-  CHECKY0 (y,    "Invalid y coordinate passed to vapi_moveto.");
-  CHECKC0 (c,    "Invalid color passed to vapi_color_text.");
-  CHECK0  (text, "Null pointer passed to vapi_pos_text.");
+  CHECKX0 (x,    "Invalid x coordinate passed to vapi_pos_color_text.");
+  CHECKY0 (y,    "Invalid y coordinate passed to vapi_pos_color_text.");
+  CHECKC0 (c,    "Invalid color passed to vapi_pos_color_text.");
+  CHECK0  (text, "Null pointer passed to vapi_pos_color_text.");
 
   vapi_moveto (x, y);
   vapi_color_text (c, text);
@@ -206,9 +206,13 @@ extern "C" void vapi_pos_color_text (int x, int y, color c, const char* text)
 // TODO Rectangle should be cropped.
 extern "C" void vapi_rectangle (int x, int y, int w, int h, color c)
 {
-  CHECKX0 (x, "Invalid x coordinate passed to vapi_moveto.");
-  CHECKY0 (y, "Invalid y coordinate passed to vapi_moveto.");
-  CHECKC0 (c, "Invalid color passed to vapi_color_text.");
+  CHECKX0 (x,   "Invalid x coordinate passed to vapi_rectangle.");
+  CHECKY0 (y,   "Invalid y coordinate passed to vapi_rectangle.");
+  CHECKX0 (x+w, "Invalid width passed to vapi_rectangle.");
+  CHECKX0 (y+h, "Invalid height passed to vapi_rectangle.");
+  CHECKX0 (w,   "Invalid width passed to vapi_rectangle.");
+  CHECKX0 (h,   "Invalid height passed to vapi_rectangle.");
+  CHECKC0 (c,   "Invalid color passed to vapi_rectangle.");
 
   std::string line (w, ' ');
 

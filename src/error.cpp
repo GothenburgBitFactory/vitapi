@@ -54,6 +54,9 @@ extern "C" int vitapi_error (char* buf, size_t size)
   }
 
   strncpy (buf, error.c_str (), size);
+
+  // The act of reading the error resets it.
+  error = "";
   return 0;
 }
 

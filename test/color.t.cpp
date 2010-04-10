@@ -33,7 +33,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 int main (int argc, char** argv)
 {
-  UnitTest t (1024);
+  UnitTest t (1026);
 
   // Auto upgrades.
   char value [256];
@@ -61,6 +61,9 @@ int main (int argc, char** argv)
   c = color_blend (color_def ("bold underline red"), color_def ("on bright white"));
   color_name (value, 256, c);
   t.is (value, "bold underline red on bright white", "bold underline red + on bright white -> bold underline red on bright white");
+
+  t.is (color_blend (color_def ("red"), -1), color_def ("red"), "blend red, -1 -> red");
+  t.is (color_blend (-1, color_def ("red")), color_def ("red"), "blend -1, red, -> red");
 
   // Blending with conflicts.
   c = color_blend (color_def ("red on white"), color_def ("on blue"));
