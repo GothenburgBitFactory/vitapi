@@ -125,10 +125,11 @@ void vapi_title (const char*);           // Set the terminal title
 int  tapi_initialize (const char*);      // Initialize terminal caps
 void tapi_add (const char*, const char*);
                                          // Provide new terminal configuration
-void tapi_get (const char*, char*);      // Get control string
-void tapi_get_xy (const char*, char*, int, int);
+void tapi_get (const char*, char*, size_t);
+                                         // Get control string
+void tapi_get_xy (const char*, char*, size_t, int, int);
                                          // Get control string with x,y subst
-void tapi_get_str (const char*, char*, const char*);
+void tapi_get_str (const char*, char*, size_t, const char*);
                                          // Get control string with string subst
 
 // error messages.

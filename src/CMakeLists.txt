@@ -6,5 +6,6 @@ set (vitapi_SRCS color.cpp
                  tapi.cpp
                  util.cpp util.h
                  error.cpp
-                 vitapi.h)
+                 vitapi.h
+                 check.h)
 add_library (vitapi STATIC ${vitapi_SRCS})

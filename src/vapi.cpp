@@ -32,12 +32,15 @@
 #include <signal.h>
 #include <sys/ioctl.h>
 #include <vitapi.h>
+#include <check.h>
 
 static std::stringstream output; // Output buffer
 static int screenWidth  = 0;     // Terminal width
 static int screenHeight = 0;     // Terminal height (may include status line)
 static bool full_screen = false; // Should deinitialize restore?
 static bool has_status  = false; // Terminal has status area
+
+#define MAX_TAPI_SIZE 64         // Max expected key size.
 
 static void getTerminalSize (int&, int&);
 static void handler (int);
@@ -55,8 +58,8 @@ extern "C" int vapi_initialize ()
   {
     tapi_initialize (term);
 
-    char hs[64];
-    tapi_get ("hs", hs);
+    char hs[MAX_TAPI_SIZE];
+    tapi_get ("hs", hs, MAX_TAPI_SIZE);
     has_status = hs != "" ? true : false;
 
     // Handle assorted signals.
@@ -103,10 +106,10 @@ extern "C" int vapi_refresh ()
 // Use the full screen
 extern "C" void vapi_full_screen ()
 {
-  char ti[64];
-  char alt[64];
-  tapi_get ("ti", ti);
-  tapi_get ("Alt", alt);
+  char ti[MAX_TAPI_SIZE];
+  char alt[MAX_TAPI_SIZE];
+  tapi_get ("ti", ti, MAX_TAPI_SIZE);
+  tapi_get ("Alt", alt, MAX_TAPI_SIZE);
   output << ti << alt;
 
   full_screen = true;
@@ -116,8 +119,8 @@ extern "C" void vapi_full_screen ()
 // End use of full screen
 extern "C" void vapi_end_full_screen ()
 {
-  char te[64];
-  tapi_get ("te", te);
+  char te[MAX_TAPI_SIZE];
+  tapi_get ("te", te, MAX_TAPI_SIZE);
   output << te;
 
   full_screen = false;
@@ -127,8 +130,8 @@ extern "C" void vapi_end_full_screen ()
 // Clear the screen
 extern "C" void vapi_clear ()
 {
-  char cl[64];
-  tapi_get ("cl", cl);
+  char cl[MAX_TAPI_SIZE];
+  tapi_get ("cl", cl, MAX_TAPI_SIZE);
   output << cl;
 }
 
@@ -136,8 +139,11 @@ extern "C" void vapi_clear ()
 // Move cursor
 extern "C" void vapi_moveto (int x, int y)
 {
-  char mv[64];
-  tapi_get_xy ("Mv", mv, x, y);
+  CHECKX0 (x, "Invalid x coordinate passed to vapi_moveto.");
+  CHECKY0 (y, "Invalid y coordinate passed to vapi_moveto.");
+
+  char mv[MAX_TAPI_SIZE];
+  tapi_get_xy ("Mv", mv, MAX_TAPI_SIZE, x, y);
   output << mv;
 }
 
@@ -145,6 +151,8 @@ extern "C" void vapi_moveto (int x, int y)
 // Draw text at cursor
 extern "C" void vapi_text (const char* text)
 {
+  CHECK0 (text, "Null pointer passed to vapi_text.");
+
   output << text;
 }
 
@@ -152,6 +160,9 @@ extern "C" void vapi_text (const char* text)
 // Draw colored text at cursor
 extern "C" void vapi_color_text (color c, const char* text)
 {
+  CHECKC0 (c,    "Invalid color passed to vapi_color_text.");
+  CHECK0  (text, "Null pointer passed to vapi_color_text.");
+
   int safe_size = strlen (text) + 24;
   char* buf = new char [safe_size];
   if (buf)
@@ -168,6 +179,10 @@ extern "C" void vapi_color_text (color c, const char* text)
 // TODO Text placement should be cropped.
 extern "C" void vapi_pos_text (int x, int y, const char* text)
 {
+  CHECKX0 (x,    "Invalid x coordinate passed to vapi_moveto.");
+  CHECKY0 (y,    "Invalid y coordinate passed to vapi_moveto.");
+  CHECK0  (text, "Null pointer passed to vapi_pos_text.");
+
   vapi_moveto (x, y);
   vapi_text (text);
 }
@@ -177,6 +192,11 @@ extern "C" void vapi_pos_text (int x, int y, const char* text)
 // TODO Text placement should be cropped.
 extern "C" void vapi_pos_color_text (int x, int y, color c, const char* text)
 {
+  CHECKX0 (x,    "Invalid x coordinate passed to vapi_moveto.");
+  CHECKY0 (y,    "Invalid y coordinate passed to vapi_moveto.");
+  CHECKC0 (c,    "Invalid color passed to vapi_color_text.");
+  CHECK0  (text, "Null pointer passed to vapi_pos_text.");
+
   vapi_moveto (x, y);
   vapi_color_text (c, text);
 }
@@ -186,6 +206,10 @@ extern "C" void vapi_pos_color_text (int x, int y, color c, const char* text)
 // TODO Rectangle should be cropped.
 extern "C" void vapi_rectangle (int x, int y, int w, int h, color c)
 {
+  CHECKX0 (x, "Invalid x coordinate passed to vapi_moveto.");
+  CHECKY0 (y, "Invalid y coordinate passed to vapi_moveto.");
+  CHECKC0 (c, "Invalid color passed to vapi_color_text.");
+
   std::string line (w, ' ');
 
   for (int i = 0; i < h; ++i)
@@ -214,8 +238,10 @@ extern "C" int vapi_height ()
 // Set the terminal title
 extern "C" void vapi_title (const char* title)
 {
-  char ttl[64];
-  tapi_get_str ("Ttl", ttl, title);
+  CHECK0 (title, "Null pointer passed to vapi_title.");
+
+  char ttl[MAX_TAPI_SIZE];
+  tapi_get_str ("Ttl", ttl, MAX_TAPI_SIZE, title);
   output << ttl << std::flush;
 }
 

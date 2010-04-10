@@ -24,19 +24,8 @@
 //     USA
 //
 ////////////////////////////////////////////////////////////////////////////////
-//#include <strings.h>
-//#include <ctype.h>
-//#include <iostream>
-//#include <fstream>
-//#include <sstream>
-//#include <sys/time.h>
-//#include <fcntl.h>
-//#include <unistd.h>
-//#include <stdio.h>
-//#include <string.h>
-//#include <pwd.h>
-#include "util.h"
 
+#include "util.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 void split (

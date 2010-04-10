@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // VITapi - UI helper library that controls Visuals, Input and Terminals.
 //
-// Copyright 2010, Paul Beckingham, Federico Hernandez.
+// Copyright 2009 - 2010, Paul Beckingham, Federico Hernandez.
 // All rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify it under
@@ -24,35 +24,19 @@
 //     USA
 //
 ////////////////////////////////////////////////////////////////////////////////
-#include <vitapi.h>
-#include <test.h>
 
+#ifndef INCLUDED_CHECK
+#define INCLUDED_CHECK
+
+void vitapi_set_error (const std::string&);
+
+#define CHECK0(arg,msg)  if (!arg)                  {vitapi_set_error (msg); return;}
+#define CHECK1(arg,msg)  if (!arg)                  {vitapi_set_error (msg); return -1;}
+#define CHECKC0(arg,msg) if (arg == -1)             {vitapi_set_error (msg); return;}
+#define CHECKC1(arg,msg) if (arg == -1)             {vitapi_set_error (msg); return -1;}
+#define CHECKX0(x,msg)   if (x<1 || x>screenWidth)  {vitapi_set_error (msg); return;}
+#define CHECKY0(y,msg)   if (y<1 || y>screenHeight) {vitapi_set_error (msg); return;}
+
+#endif
 ////////////////////////////////////////////////////////////////////////////////
-int main (int argc, char** argv)
-{
-  UnitTest t (7);
 
-  t.is (tapi_initialize ("xterm-256color"),  0, "tapi_initialize xterm-256color good");
-  t.is (tapi_initialize ("foo"),            -1, "tapi_initialize foo bad");
-
-  tapi_add ("foo", "a:_E_ b:_E__s__B_ c:_x_,_y_ d:bunny e:_E__E__E__E__E__E__E__E_");
-
-  char value[64];
-  tapi_get ("a", value, 64);
-  t.is (value, "\033", "_E_ -> \\033");
-
-  tapi_get_str ("b", value, 64, "dog");
-  t.is (value, "\033dog\007", "_E__s__B_ -> \\033dog\\007");
-
-  tapi_get_xy ("c", value, 64, 1, 2);
-  t.is (value, "1,2", "_x_,_y_ -> 1,2");
-
-  tapi_get ("d", value, 64);
-  t.is (value, "bunny", "bunny -> bunny");
-
-  tapi_get ("e", value, 64);
-  t.is (value, "\033\033\033\033\033\033\033\033", "_E__E__E__E__E__E__E__E_ -> \\033\\033\\033\\033\\033\\033\\033\\033");
-  return 0;
-}
-
-////////////////////////////////////////////////////////////////////////////////

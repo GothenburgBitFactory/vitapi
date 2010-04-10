@@ -99,6 +99,12 @@ int main (int argc, char** argv)
   t.is (error, "Insufficient buffer size passed to color_colorize.",
                "error            -> Null buffer pointer passed to color_colorize.");
 
+  // TODO tapi_initialize
+  // TODO tapi_add
+  // TODO tapi_get
+  // TODO tapi_get_xy
+  // TODO tapi_get_str
+
   return 0;
 }
 

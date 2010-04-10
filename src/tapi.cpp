@@ -30,6 +30,7 @@
 #include <sstream>
 #include <string.h>
 #include <vitapi.h>
+#include <check.h>
 
 static std::string current_term;
 static std::map <std::string, std::string> data;
@@ -74,6 +75,9 @@ static std::string substitute (const std::string&, const std::string&, int);
 //   _B_               <Bell>
 extern "C" int tapi_initialize (const char* term)
 {
+  CHECK1 (term, "Null pointer to a terminal type passed to tapi_initialize.");
+
+  // Default value is 'xterm-256color'.
   current_term = strcmp (term, "") ? term : "xterm-256color";
 
   // Settings that are common to all terminals.
@@ -84,11 +88,42 @@ extern "C" int tapi_initialize (const char* term)
   std::string alternate   = "Alt:_E_[1049h ";
   std::string title       = "Ttl:_E_]2;_s__B_";   // No trailing space, so last.
 
-  // Now the terminal-specific settings.
+  std::string common = app_mode + normal_mode + mouse + move + alternate + title;
 
-  //data["vt100"] = "";       // TODO Missing def
-  //data["vt220"] = "";       // TODO Missing def
-  //data["xterm-color"] = ""; // TODO Missing def
+  // Now the terminal-specific settings.  The following is a list of
+  // Lucid-supported terminal programs, which is a good starting point for the
+  // terminals that we might want to support:
+  //
+  // TODO aterm          - Afterstep XVT - a VT102 emulator for the X
+  // TODO aterm-ml       - Afterstep XVT - a VT102 emulator for the X
+  // TODO eterm          - Enlightened Terminal Emulator
+  // TODO fbiterm        - framebuffer internationalized terminal emu
+  // TODO fbterm         - A fast framebuffer based terminal emulator
+  // TODO gnome-terminal - The GNOME terminal emulator application
+  // TODO gtkterm        - A simple GTK+ serial port terminal
+  // TODO jfbterm        - multilingual terminal on Linux framebuffer
+  // TODO kterm          - Multi-lingual terminal emulator for X
+  // TODO lxterminal     - desktop independent vte-based terminal emu
+  // TODO mlterm         - MultiLingual TERMinal
+  // TODO mrxvt          - lightweight multi-tabbed X terminal emulator
+  // TODO multi-aterm    - tabbed terminal emulator with efficent pse
+  // TODO pterm          - PuTTY terminal emulator
+  // TODO roxterm        - Multi-tabbed GTK/VTE terminal emulator
+  // TODO rxvt           - VT102 terminal emulator for the X Window System
+  // TODO rxvt-unicode   - RXVT-like terminal emulator with Unicode support
+  // TODO terminal.app   - Terminal Emulator for GNUstep
+  // TODO terminator     - multiple GNOME terminals in one window
+  // TODO wterm          - lightweight terminal emulator for X
+  // TODO wterm-ml       - lightweight multilingual terminal emulator
+  // TODO xfce4-terminal - Xfce terminal emulator
+  // TODO xiterm         - internationalized terminal emulator for X
+  //
+  // Others:
+  //
+  // TODO vt100
+  // TODO vt102
+  // TODO vt220
+  // TODO xterm-color
 
   data["xterm"] = data["xterm-256color"] =
     "ku:_E_OA "
@@ -114,13 +149,7 @@ extern "C" int tapi_initialize (const char* term)
     "te:_E_[?1049l "
     "hs:1 "
     "cl:_E_[_E_[2J "
-    + app_mode
-    + normal_mode
-    + mouse
-    + move
-    + alternate
-    + title;
-
+    + common;
 
   data["rxvt"] = data["rxvt-unicode"] =
     "ku:_E_OA "
@@ -143,16 +172,14 @@ extern "C" int tapi_initialize (const char* term)
     "ti:_E_[?1049h "
     "te:_E_[r_E_[?1049l "
     "cl:_E_[H_E_[2J "
-    + app_mode
-    + normal_mode
-    + mouse
-    + move
-    + alternate
-    + title;
+    + common;
 
   // Error if term is not supported.
   if (data.find (term) == data.end ())
+  {
+    vitapi_set_error (std::string ("Terminal type '") + term + "' is not supported.");
     return -1;
+  }
 
   return 0;
 }
@@ -161,31 +188,74 @@ extern "C" int tapi_initialize (const char* term)
 // This is currently the only way to provide additional terminal types.
 extern "C" void tapi_add (const char* term, const char* def)
 {
+  CHECK0 (term, "Null pointer to a terminal type passed to tapi_add.");
+  CHECK0 (def,  "Null pointer to a terminal definition passed to tapi_add.");
+
   data[term] = def;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Simply returns the control string - may or may not be ready to use.
-extern "C" void tapi_get (const char* key, char* value)
+extern "C" void tapi_get (const char* key, char* value, size_t size)
 {
+  CHECK0 (key,   "Null pointer to a terminal key passed to tapi_get.");
+  CHECK0 (value, "Null pointer for a key value passed to tapi_get.");
+
   std::string s = decode (lookup (key));
-  strcpy (value, s.c_str ());
+
+  if (s.length () + 1 >= size)
+  {
+    vitapi_set_error ("Insufficient buffer size passed to tapi_get.");
+    return;
+  }
+
+  strncpy (value, s.c_str (), size);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Returns the control string with [x,y] coordinate substitution, ready to use.
-extern "C" void tapi_get_xy (const char* key, char* value, int x, int y)
+extern "C" void tapi_get_xy (
+  const char* key,
+  char* value,
+  size_t size,
+  int x,
+  int y)
 {
+  CHECK0 (key,   "Null pointer to a terminal key passed to tapi_get_xy.");
+  CHECK0 (value, "Null pointer for a key value passed to tapi_get_xy.");
+
   std::string s = encode (decode (lookup (key)), x, y);
-  strcpy (value, s.c_str ());
+
+  if (s.length () + 1 >= size)
+  {
+    vitapi_set_error ("Insufficient buffer size passed to tapi_get_xy.");
+    return;
+  }
+
+  strncpy (value, s.c_str (), size);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Returns the control string with string substitution, ready to use.
-extern "C" void tapi_get_str (const char* key, char* value, const char* str)
+extern "C" void tapi_get_str (
+  const char* key,
+  char* value,
+  size_t size,
+  const char* str)
 {
+  CHECK0 (key,   "Null pointer to a terminal key passed to tapi_get_str.");
+  CHECK0 (value, "Null pointer for a key value passed to tapi_get_str.");
+  CHECK0 (str,   "Null pointer for a substitution passed to tapi_get_str.");
+
   std::string s = encode (decode (lookup (key)), str);
-  strcpy (value, s.c_str ());
+
+  if (s.length () + 1 >= size)
+  {
+    vitapi_set_error ("Insufficient buffer size passed to tapi_get_str.");
+    return;
+  }
+
+  strncpy (value, s.c_str (), size);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

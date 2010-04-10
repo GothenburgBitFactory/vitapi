@@ -41,10 +41,13 @@
 #endif
 
 #include <vitapi.h>
+#include <check.h>
 
 static struct termios tty;                    // Original I/O state.
 static std::map <int, std::string> sequences; // Key -> sequence mapping.
 static int mouse_x = -1, mouse_y = -1;        // Last known mouse position.
+
+#define MAX_TAPI_SIZE 64                      // Max expected key size.
 
 static void translate (std::deque <int>&);
 static void translateMouse (std::deque <int>&);
@@ -62,28 +65,28 @@ extern "C" int iapi_initialize ()
   {
     if (! tapi_initialize (term))
     {
-      char value[64];
-      tapi_get ("ku", value);   sequences[IAPI_KEY_UP]        = value;
-      tapi_get ("kd", value);   sequences[IAPI_KEY_DOWN]      = value;
-      tapi_get ("kr", value);   sequences[IAPI_KEY_RIGHT]     = value;
-      tapi_get ("kl", value);   sequences[IAPI_KEY_LEFT]      = value;
-      tapi_get ("k1", value);   sequences[IAPI_KEY_F1]        = value;
-      tapi_get ("k2", value);   sequences[IAPI_KEY_F2]        = value;
-      tapi_get ("k3", value);   sequences[IAPI_KEY_F3]        = value;
-      tapi_get ("k4", value);   sequences[IAPI_KEY_F4]        = value;
-      tapi_get ("k5", value);   sequences[IAPI_KEY_F5]        = value;
-      tapi_get ("k6", value);   sequences[IAPI_KEY_F6]        = value;
-      tapi_get ("k7", value);   sequences[IAPI_KEY_F7]        = value;
-      tapi_get ("k8", value);   sequences[IAPI_KEY_F8]        = value;
-      tapi_get ("k9", value);   sequences[IAPI_KEY_F9]        = value;
-      tapi_get ("k0", value);   sequences[IAPI_KEY_F10]       = value;
-      tapi_get ("kH", value);   sequences[IAPI_KEY_HOME]      = value;
-      tapi_get ("kb", value);   sequences[IAPI_KEY_BACKSPACE] = value;
-      tapi_get ("kD", value);   sequences[IAPI_KEY_DEL]       = value;
-      tapi_get ("kP", value);   sequences[IAPI_KEY_PGUP]      = value;
-      tapi_get ("kN", value);   sequences[IAPI_KEY_PGDN]      = value;
+      char value[MAX_TAPI_SIZE];
+      tapi_get ("ku", value, MAX_TAPI_SIZE); sequences[IAPI_KEY_UP]        = value;
+      tapi_get ("kd", value, MAX_TAPI_SIZE); sequences[IAPI_KEY_DOWN]      = value;
+      tapi_get ("kr", value, MAX_TAPI_SIZE); sequences[IAPI_KEY_RIGHT]     = value;
+      tapi_get ("kl", value, MAX_TAPI_SIZE); sequences[IAPI_KEY_LEFT]      = value;
+      tapi_get ("k1", value, MAX_TAPI_SIZE); sequences[IAPI_KEY_F1]        = value;
+      tapi_get ("k2", value, MAX_TAPI_SIZE); sequences[IAPI_KEY_F2]        = value;
+      tapi_get ("k3", value, MAX_TAPI_SIZE); sequences[IAPI_KEY_F3]        = value;
+      tapi_get ("k4", value, MAX_TAPI_SIZE); sequences[IAPI_KEY_F4]        = value;
+      tapi_get ("k5", value, MAX_TAPI_SIZE); sequences[IAPI_KEY_F5]        = value;
+      tapi_get ("k6", value, MAX_TAPI_SIZE); sequences[IAPI_KEY_F6]        = value;
+      tapi_get ("k7", value, MAX_TAPI_SIZE); sequences[IAPI_KEY_F7]        = value;
+      tapi_get ("k8", value, MAX_TAPI_SIZE); sequences[IAPI_KEY_F8]        = value;
+      tapi_get ("k9", value, MAX_TAPI_SIZE); sequences[IAPI_KEY_F9]        = value;
+      tapi_get ("k0", value, MAX_TAPI_SIZE); sequences[IAPI_KEY_F10]       = value;
+      tapi_get ("kH", value, MAX_TAPI_SIZE); sequences[IAPI_KEY_HOME]      = value;
+      tapi_get ("kb", value, MAX_TAPI_SIZE); sequences[IAPI_KEY_BACKSPACE] = value;
+      tapi_get ("kD", value, MAX_TAPI_SIZE); sequences[IAPI_KEY_DEL]       = value;
+      tapi_get ("kP", value, MAX_TAPI_SIZE); sequences[IAPI_KEY_PGUP]      = value;
+      tapi_get ("kN", value, MAX_TAPI_SIZE); sequences[IAPI_KEY_PGDN]      = value;
 
-      tapi_get ("AM", value);
+      tapi_get ("AM", value, MAX_TAPI_SIZE);
       std::cout << value;        // Application mode.
       return 0;
     }
@@ -96,8 +99,8 @@ extern "C" int iapi_initialize ()
 // End of processed input
 extern "C" void iapi_deinitialize ()
 {
-  char value[64];
-  tapi_get ("NM", value);
+  char value[MAX_TAPI_SIZE];
+  tapi_get ("NM", value, MAX_TAPI_SIZE);
   std::cout << value;            // Normal mode.
 
   tcsetattr (0, TCSANOW, &tty);  // Restore initial state.
@@ -149,8 +152,8 @@ extern "C" void iapi_noraw ()
 // pressed.
 extern "C" void iapi_mouse ()
 {
-  char value[64];
-  tapi_get ("Ms1", value);
+  char value[MAX_TAPI_SIZE];
+  tapi_get ("Ms1", value, MAX_TAPI_SIZE);
   std::cout << value << std::flush;
 }
 
@@ -158,8 +161,8 @@ extern "C" void iapi_mouse ()
 // Disable mouse clicks
 extern "C" void iapi_nomouse ()
 {
-  char value[64];
-  tapi_get ("Ms0", value);
+  char value[MAX_TAPI_SIZE];
+  tapi_get ("Ms0", value, MAX_TAPI_SIZE);
   std::cout << value;
 }
 
@@ -169,8 +172,8 @@ extern "C" void iapi_nomouse ()
 // pressed.
 extern "C" void iapi_mouse_tracking ()
 {
-  char value[64];
-  tapi_get ("Mt1", value);
+  char value[MAX_TAPI_SIZE];
+  tapi_get ("Mt1", value, MAX_TAPI_SIZE);
   std::cout << value << std::flush;
 }
 
@@ -178,8 +181,8 @@ extern "C" void iapi_mouse_tracking ()
 // Disable mouse clicks and tracking
 extern "C" void iapi_nomouse_tracking ()
 {
-  char value[64];
-  tapi_get ("Mt0", value);
+  char value[MAX_TAPI_SIZE];
+  tapi_get ("Mt0", value, MAX_TAPI_SIZE);
   std::cout << value;
 }
 
@@ -187,6 +190,9 @@ extern "C" void iapi_nomouse_tracking ()
 // Get last known mouse position
 extern "C" void iapi_mouse_pos (int* x, int* y)
 {
+  CHECK0 (x, "Null pointer to x coordinate passed to iapi_mouse_pos");
+  CHECK0 (y, "Null pointer to y coordinate passed to iapi_mouse_pos");
+
   *x = mouse_x;
   *y = mouse_y;
 }

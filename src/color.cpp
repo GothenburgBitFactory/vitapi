@@ -32,6 +32,7 @@
 #include <string.h>
 #include <util.h>
 #include <vitapi.h>
+#include <check.h>
 
 static std::string error;
 static char color_names[][16] =
@@ -45,8 +46,6 @@ static char color_names[][16] =
 static int color_index (const std::string&);
 static std::string color_fg (color);
 static std::string color_bg (color);
-
-void vitapi_set_error (const std::string&);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Supports the following constructs:
@@ -62,11 +61,7 @@ void vitapi_set_error (const std::string&);
 //   rgbRGB 0 <= R,G,B <= 5    fg 38;5;16 + R*36 + G*6 + B  bg 48;5;16 + R*36 + G*6 + B
 extern "C" color color_def (const char* def)
 {
-  if (!def)
-  {
-    vitapi_set_error ("Null pointer to a color definition passed to color_def.");
-    return -1;
-  }
+  CHECK1 (def, "Null pointer to a color definition passed to color_def.");
 
   // The color that is being constructed.
   color c = 0;
@@ -219,17 +214,8 @@ extern "C" color color_def (const char* def)
 // Convert a color -> description
 extern "C" void color_name (char* buf, size_t size, color c)
 {
-  if (!buf)
-  {
-    vitapi_set_error ("Null buffer pointer passed to color_name.");
-    return;
-  }
-
-  if (c == -1)
-  {
-    vitapi_set_error ("Invalid color passed to color_name.");
-    return;
-  }
+  CHECK0 (buf, "Null buffer pointer passed to color_name.");
+  CHECKC0 (c,  "Invalid color passed to color_name.");
 
   std::string description;
   if (c & _COLOR_BOLD) description += "bold";
@@ -263,11 +249,7 @@ extern "C" void color_name (char* buf, size_t size, color c)
 // Convert 16- to 256-color
 extern "C" color color_upgrade (color c)
 {
-  if (c == -1)
-  {
-    vitapi_set_error ("Invalid color passed to color_name.");
-    return -1;
-  }
+  CHECKC1 (c, "Invalid color passed to color_upgrade.");
 
   if (!(c & _COLOR_256))
   {
@@ -380,11 +362,8 @@ extern "C" color color_blend (color one, color two)
 //   256 bg               \033[48;5;Nm
 extern "C" void color_colorize (char* buf, size_t size, color c)
 {
-  if (!buf)
-  {
-    vitapi_set_error ("Null buffer pointer passed to color_colorize.");
-    return;
-  }
+  CHECK0 (buf, "Null buffer pointer passed to color_colorize.");
+  CHECKC0 (c, "Invalid color passed to color_colorize.");
 
   int count = 0;
   std::stringstream result;
