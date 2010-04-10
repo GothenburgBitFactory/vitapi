@@ -1,10 +1,9 @@
 
-New Features in vitapi 0.1
+New Features in Vitapi 0.8alpha
 
-  - ?
+  - It's alpha - everything is new!
 
-  Please refer to the ChangeLog file for full details.  There are too many to
-  list here.
+  Please refer to the ChangeLog file for full details.
 
 Vitapi has been built and tested on the following configurations:
 
@@ -16,6 +15,8 @@ and with the following $TERM values:
 
   * xterm-256color
   * xterm
+  * rxvt
+  * rxvt-unicode
 
 While Vitapi has undergone testing, bugs are sure to remain.  If you
 encounter a bug, please send a message to:

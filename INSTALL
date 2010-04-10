@@ -5,9 +5,10 @@ build the binaries.
 
     $ cmake .
     $ make
+    $ make test
     $ sudo make install
 
-You will need cmake (www.cmake.org) installed in order to build the software.
-You'll like it.
+Note that you will need cmake (www.cmake.org) installed in order to build the
+software.  You'll like it.
 
 ---
