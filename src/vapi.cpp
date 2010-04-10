@@ -103,6 +103,16 @@ extern "C" int vapi_refresh ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Discard accumulated but unrefreshed output
+extern "C" int vapi_discard ()
+{
+  int bytes = output.str ().size ();
+  output.str ("");
+
+  return bytes;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Use the full screen
 extern "C" void vapi_full_screen ()
 {

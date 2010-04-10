@@ -104,6 +104,7 @@ int  iapi_getch ();                      // Get processed input
 int  vapi_initialize ();                 // Initialize visual processing
 void vapi_deinitialize ();               // End of visual processing
 int  vapi_refresh ();                    // Update the display
+int  vapi_discard ();                    // Discard accumulated output
 void vapi_full_screen ();                // Use the full screen
 void vapi_end_full_screen ();            // End use of full screen
 void vapi_clear ();                      // Clear the screen
