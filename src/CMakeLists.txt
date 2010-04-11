@@ -9,3 +9,6 @@ set (vitapi_SRCS color.cpp
                  vitapi.h
                  check.h)
 add_library (vitapi STATIC ${vitapi_SRCS})
+set (CMAKE_INSTALL_LIBDIR lib CACHE PATH "Output directory for libraries")
+install (TARGETS vitapi DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install (FILES vitapi.h DESTINATION include)
