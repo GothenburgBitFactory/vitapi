@@ -1,4 +1,4 @@
-.TH vitapi 3 2010-04-07 "vitapi 0.8.0" "Library Functions Manual"
+.TH vitapi 3 2010-04-07 "vitapi 0.8.0alpha" "Library Functions Manual"
 
 .SH NAME
 vitapi \- A library providing support for terminals, input and visuals.
@@ -7,41 +7,389 @@ vitapi \- A library providing support for terminals, input and visuals.
 .B libvitapi.a (-lvitapi)
 
 .SH SYNOPSIS
-.B #include <vitapi.h>
+#include <vitapi.h>
 
 color
 .B color_def
-(const char*);
+(const char* def);
+
 void
 .B color_name
-(char*, size_t, color);
+(char* buffer, size_t size, color c);
+
 color
 .B color_upgrade
-(color);
+(color c);
+
 color
 .B color_downgrade
-(color);
+(color c);
+
 color
 .B color_blend
-(color, color);
+(color one, color two);
+
 void
 .B color_colorize
-(char*, size_t, color);
+(char* buffer, size_t size, color c);
+
+int
+.B iapi_initialize
+();
+
+void
+.B iapi_deinitialize
+();
+
+void
+.B iapi_echo
+();
+
+void
+.B iapi_noecho
+();
+
+void
+.B iapi_raw
+();
+
+void
+.B iapi_noraw
+();
+
+void
+.B iapi_mouse
+();
+
+void
+.B iapi_nomouse
+();
+
+void
+.B iapi_mouse_tracking
+();
+
+void
+.B iapi_nomouse_tracking
+();
+
+void
+.B iapi_mouse_pos
+(int* x, int* y);
+
+int
+.B iapi_getch
+();
+
+int
+.B vapi_initialize
+();
+
+void
+.B vapi_deinitialize
+();
+
+int
+.B vapi_refresh
+();
+
+int
+.B vapi_discard
+();
+
+void
+.B vapi_full_screen
+();
+
+void
+.B vapi_end_full_screen
+();
+
+void
+.B vapi_clear
+();
+
+void
+.B vapi_moveto
+(int x, int y);
+
+void
+.B vapi_text
+(const char* str);
+
+void
+.B vapi_color_text
+(color c, const char* str);
+
+void
+.B vapi_pos_text
+(int x, int y, const char* str);
+
+void
+.B vapi_pos_color_text
+(int x, int y, color c, const char* str);
+
+void
+.B vapi_rectangle
+(int x, int y, int width, int height, color c);
+
+int
+.B vapi_width
+();
+
+int
+.B vapi_height
+();
+
+void
+.B vapi_title
+(const char* str);
+
+int
+.B tapi_initialize
+(const char* term);
+
+void
+.B tapi_add
+(const char* term, const char* def);
+
+void
+.B tapi_get
+(const char* key, char* buffer, size_t size);
+
+void
+.B tapi_get_xy
+(const char* key, char* buffer, size_t size, int x, int y);
+
+void
+.B tapi_get_str
+(const char* key, char* buffer, size_t size, const char* str);
+
+int
+.B vitapi_error
+(char* buffer, size_t size);
+
+.SH DESCRIPTION - COLOR
+A color is simply an integer, which is created by
+.B color_def
+and manipulated by the other functions.
+
+.B color color_def (const char* def);
+
+creates a color from a definition string.  Basic color support is provided
+through named colors:
+
+    black, red, blue, green, magenta, cyan, yellow, white
+
+Foreground color (for text) is simply specified as one of the above colors, or
+not specified at all to use the default terminal text color.  Background color
+is specified by using the word 'on', and one of the above colors.  Some
+examples:
+
+    color a, b, c;
+
+    a = color_def ("green");           // green text, default background color
+    b = color_def ("green on yellow"); // green text, yellow background
+    c = color_def ("on yellow");       // default text color, yellow background
+
+These colors can be modified further, by making the foreground bold, or by
+making the background bright.  Some examples:
+
+    color d, e, f;
+    d = color_def ("bold green");
+    e = color_def ("bold white on bright red");
+    f = color_def ("on bright cyan");
+
+The order of the words is not important, so the following are equivalent:
+
+    color g, h;
+    g = color_def ("bold green");
+    h = color_def ("green bold");
+
+    if (g == h)
+    {
+      // Always true.
+    }
+
+But the 'on' is important - colors before the 'on' are foreground, and colors
+after 'on' are background.  There is an additional 'underline' attribute that
+may be used:
+
+    color i;
+    i = color_def ("underline bright red on black");
+
+Some combinations look very nice, some look terrible.  Different terminal
+programs do implement slightly different versions of 'red', for example, so you
+may see some unwanted variation due to the difference between terminal programs.
+The brightness of your display is also a factor, as is the default background
+color.
+
+Using 256 colors follows the same form, but the names are different, and some
+colors can be referenced in different ways.  First there is by color ordinal,
+which is like this:
+
+    color0
+    color1
+    color2
+    ...
+    color255
+
+This gives you access to all 256 colors, but doesn't help you much.  This range
+is a combination of 8 basic colors (color0 - color7), then 8 brighter variations
+(color8 - color15).  Then a block of 216 colors (color16 - color231).  Then a
+block of 24 gray colors (color232 - color255).
+
+The large block of 216 colors (6x6x6 = 216) represents a color cube, which can
+be addressed via RGB values from 0 to 5 for each component color.  A value of 0
+means none of this component color, and a value of 5 means the most intense
+component color.  For example, a bright red is specified as:
+
+    rgb500
+
+And a darker red would be:
+
+    rgb300
+
+Note that the three digits represent the three component values, so in this
+example the 5, 0 and 0 represent red=5, green=0, blue=0.  Combining intense red
+with no green and no blue yields red.  Similarly, blue and green are:
+
+    rgb005
+    rgb050
+
+Another example - bright yellow - is a mix of bright red and bright green, but
+no blue component, so bright yellow is addressed as:
+
+    rgb550
+
+A soft pink would be addressed as:
+
+    rgb515
+
+A block of 24 gray colors can also be accessed as gray0 - gray23, in a
+continuous ramp from black to white.
+
+If you specify 16-colors, and view on a 256-color terminal, no problem.  If you
+try the reverse, specifying 256-colors and viewing on a 16-color terminal, you
+will be disappointed, perhaps even appalled.
+
+There is some limited color mapping - for example, if you were to specify this
+combination:
+
+    color c;
+    c = color_def ("red on gray3");
+
+then you are mixing a 16-color and 256-color specification.  Vitapi will map red
+to color1, and proceed.  Note that red and color1 are not quite the same on
+almost all terminals.
+
+Note also that there is no bold or bright attributes when dealing with 256
+colors, but there is underline available.
+
+.B void  color_name (char*, size_t, color);
+
+.B color color_upgrade (color);
+
+.B color color_downgrade (color);
+
+.B color color_blend (color, color);
+
+.B void  color_colorize (char*, size_t, color);
+
+.SH DESCRIPTION - IAPI
+
+.B int  iapi_initialize ();
+
+.B void iapi_deinitialize ();
+
+.B void iapi_echo ();
+
+.B void iapi_noecho ();
+
+.B void iapi_raw ();
+
+.B void iapi_noraw ();
+
+.B void iapi_mouse ();
+
+.B void iapi_nomouse ();
+
+.B void iapi_mouse_tracking ();
+
+.B void iapi_nomouse_tracking ();
+
+.B void iapi_mouse_pos (int*, int*);
+
+.B int  iapi_getch ();
+
+.SH DESCRIPTION - VAPI
+
+.B int  vapi_initialize ();
+
+.B void vapi_deinitialize ();
+
+.B int  vapi_refresh ();
+
+.B int  vapi_discard ();
+
+.B void vapi_full_screen ();
+
+.B void vapi_end_full_screen ();
+
+.B void vapi_clear ();
+
+.B void vapi_moveto (int, int);
+
+.B void vapi_text (const char*);
+
+.B void vapi_color_text (color, const char*);
+
+.B void vapi_pos_text (int, int, const char*);
+
+.B void vapi_pos_color_text (int, int, color, const char*);
+
+.B void vapi_rectangle (int, int, int, int, color);
+
+.B int  vapi_width ();
+
+.B int  vapi_height ();
+
+.B void vapi_title (const char*);
+
+.SH DESCRIPTION - TAPI
+
+.B int  tapi_initialize (const char*);
+
+.B void tapi_add (const char*, const char*);
+
+.B void tapi_get (const char*, char*, size_t);
+
+.B void tapi_get_xy (const char*, char*, size_t, int, int);
+
+.B void tapi_get_str (const char*, char*, size_t, const char*);
+
+.SH DESCRIPTION - Errors
+
+.B int vitapi_error (char*, size_t);
 
 
-.SH DESCRIPTION
+
 
 .SH EXAMPLES
 
 .SH ERRORS
 
 .SH "CREDITS & COPYRIGHTS"
-Vitapi was written by P. Beckingham <paul@beckingham.net>, F. Hernandez <ultrafredde@gmail.com>.
+Vitapi was written by P. Beckingham <paul@beckingham.net>,
+F. Hernandez <ultrafredde@gmail.com>.
 .br
 Copyright (C) 2010, P. Beckingham, F. Hernandez
 
 Vitapi is distributed under the GNU General Public License.  See
 http://www.gnu.org/licenses/gpl-2.0.txt for more information.
+
+.SH SEE ALSO
+.BR vitapi-faq(5),
 
 For more information regarding vitapi, the following may be referenced:
 
@@ -61,3 +409,4 @@ You can contact the project by writing an email to
 .TP
 Bugs in task may be reported to the issue-tracker at
 <http://taskwarrior.org>
+

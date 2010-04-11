@@ -1,0 +1,65 @@
+.TH vitapi-faq 5 2010-04-10 "vitapi 0.8.0alpha" "Library Function Manuals"
+
+.SH NAME
+task-faq \- A FAQ for the task(1) command line todo manager.
+vitapi-faq \- A FAQ for the vitapi library.
+
+.SH DESCRIPTION
+Vitapi is a library that provides support for cursor motion, color, text
+placement on screen, and rectangles.
+
+.SH WELCOME
+Welcome to the vitapi FAQ.  If you have would like to see a question answered
+here, please send us a note at <support@vitapi.org>.
+
+.TP
+.B Q: Why would I use vitapi over ncurses?
+Vitapi provides a color model that support 16- and 256-color terminals and that
+alone may be why you would want to use Vitapi.  Alternately, you might not need
+support for legacy terminal types, and just want something more lightweight.
+
+.TP
+.B Q: Does Vitapi support menus and panels?
+Not yet, but we are working on that.
+
+.TP
+.B Q: What if my terminal is not supported?
+There are two ways to handle this.  For an immediate solution, the util/termdef
+program should be run, which will generate output that can be used in the
+.B tapi_add
+call, to dynamically patch terminal support at runtime.
+
+The long term solution is to send a request to <support@vitapi.org> requesting
+support for your terminal.  Be sure to include the $TERM value, and if possible,
+the output from running util/termdef.
+
+.SH "CREDITS & COPYRIGHTS"
+task was written by P. Beckingham <paul@beckingham.net> and
+F. Hernandez <ultrafredde@gmail.com>.
+.br
+Copyright (C) 2010 P. Beckingham, F. Hernandez
+
+task is distributed under the GNU General Public License.  See
+http://www.gnu.org/licenses/gpl-2.0.txt for more information.
+
+.SH SEE ALSO
+.BR vitapi(3),
+
+For more information regarding Vitapi, the following may be referenced:
+
+.TP
+The official site at
+<http://vitapi.org>
+
+.TP
+The official code repository at
+<git://tasktools.org/task.git/>
+
+.TP
+You can contact the project by writing an email to
+<support@vitapi.org>
+
+.SH REPORTING BUGS
+.TP
+Bugs in task may be reported to the issue-tracker at
+<http://taskwarrior.org>

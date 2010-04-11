@@ -3,6 +3,8 @@ Installation Instructions
 For a first-time build, run these commands to generate the makefiles and then
 build the binaries.
 
+    $ tar xzf vitapi-0.8.0.tar.gz
+    $ cd vitapi-0.8.0
     $ cmake .
     $ make
     $ make test
