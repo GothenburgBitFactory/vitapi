@@ -33,11 +33,10 @@
 #include <stdlib.h>
 #include <termios.h>
 #include <sys/select.h>
-#include <sys/ioctl.h>
+#include <sys/fcntl.h>
 
-#ifdef SOLARIS
-#define CBREAK O_CBREAK
-#include <sys/ttold.h>
+#ifdef USE_OLD_NON_PORTABLE_TECHNIQUE
+#include <sys/ioctl.h>
 #endif
 
 #include <vitapi.h>
@@ -46,12 +45,15 @@
 static struct termios tty;                    // Original I/O state.
 static std::map <int, std::string> sequences; // Key -> sequence mapping.
 static int mouse_x = -1, mouse_y = -1;        // Last known mouse position.
+static int sequence_delay = 10000;            // 10ms delay.
 
 #define MAX_TAPI_SIZE 64                      // Max expected key size.
 
 static void translate (std::deque <int>&);
 static void translateMouse (std::deque <int>&);
 static bool same (const std::string&, const std::deque <int>&);
+static void blocking (int);
+static void non_blocking (int);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize for processed input
@@ -211,21 +213,24 @@ extern "C" void iapi_mouse_pos (int* x, int* y)
 // keyboard in three keystrokes, and in this case it should not be recognized as
 // <Up>, but as three separate keystrokes.
 //
-// In addition, we need to make sure that keystrokes were entered before we read
-// them, so that the getchar() call does not block.
+// In addition, we need to make sure that the fgetc() call only blocks when we
+// want it to.
 //
-// The solution to this problem involves select, and a tricky algorithm, which
-// is:
+// The solution is:
 //
 // 1. If there are any characters in the overflow buffer, serve those first.
-// 2. If there are none, the use select on stdin with no timeout to block until
-//    a key is pressed.
-// 3. Once a keypress is detected by select, call ioctl FIONREAD to determine
-//    how many keys were pressed, and read them.
-// 4. Scan the keys read to determine whether any recognized sequences are found
-//    and replace them with a composite key value.
-// 5. Return the first key press, and append any residual keys to the overflow
-//    buffer.
+// 2. If there are none, then make a blocking fgetc(stdin) call to read one
+//    character.
+// 3. If that character is not <Escape>, push it onto a queue.
+// 4. If that character is an <Escape>, then delay for some period of time that
+//    is significant from the computer's perspective, but unnoticeable from the
+//    user's perspective, say 20ms.  Then make successive non-blocking
+//    fgetc(stdin) calls until it returns an error, and push these onto the
+//    queue.
+// 5. Scan the queue for recognized sequences, and replace them.
+// 6. Scan the queue for recognized mouse click/release/track sequences and
+//    replace those while capturing the mouse position.
+// 7. Return the first item in the queue.
 //
 extern "C" int iapi_getch ()
 {
@@ -242,6 +247,24 @@ extern "C" int iapi_getch ()
   }
   else
   {
+    // Read one character.
+    int key = fgetc (stdin);
+    sequence.push_back (key);
+
+    // Only do the sequence dance if the first character is <Escape>.
+    if (key == 27)
+    {
+      usleep (sequence_delay);
+
+      non_blocking (fileno (stdin));
+
+      while ((key = fgetc (stdin)) != -1)
+        sequence.push_back (key);
+
+      blocking (fileno (stdin));
+    }
+
+#ifdef USE_OLD_NON_PORTABLE_TECHNIQUE
     int fd = fileno (stdin);
     fd_set readset;
     FD_ZERO (&readset);
@@ -251,13 +274,14 @@ extern "C" int iapi_getch ()
     {
       int quantity;
 #ifdef CYGWIN
-      ioctl (0, TIOCINQ, &quantity);
+      ioctl (0, TIOCINQ, &quantity);   // This doesn't seem to work on Cygwin.
 #else
       ioctl (0, FIONREAD, &quantity);
 #endif
       for (int i = 0; i < quantity; ++i)
         sequence.push_back (getchar ());
     }
+#endif
   }
 
   // Convert sequences into single key values.
@@ -376,6 +400,20 @@ static bool same (const std::string& known, const std::deque <int>& unknown)
       return false;
 
   return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+static void blocking (int fd)
+{
+  int flags = fcntl (fd, F_GETFL, 0);
+  fcntl (fd, F_SETFL, flags & ~O_NONBLOCK);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+static void non_blocking (int fd)
+{
+  int flags = fcntl (fd, F_GETFL, 0);
+  fcntl (fd, F_SETFL, flags | O_NONBLOCK);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

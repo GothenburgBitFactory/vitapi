@@ -10,6 +10,8 @@
    support only.
  + No installation of library, header, man pages.
  + Unimplemented color_downgrade.
+ + Bug: ioctl(... TIOCINQ ...) not working on Cygwin, so a new algorithm was
+   implemented.
 
 ------ old releases ------------------------------
 
