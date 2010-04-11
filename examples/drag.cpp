@@ -50,7 +50,7 @@ int main (int argc, char** argv)
     iapi_mouse_tracking ();
 
     // Draw a rectangle.
-    color c = color_def ("black on bright yellow");
+    color c = color_def ("black on cyan");
     int r_x = 1;
     int r_y = 1;
     int r_width = 10;
