@@ -174,6 +174,29 @@ extern "C" int tapi_initialize (const char* term)
     "cl:_E_[H_E_[2J "
     + common;
 
+  data["cygwin"] =
+    "ku:_E_[A "
+    "kd:_E_[B "
+    "kr:_E_[C "
+    "kl:_E_[D "
+    "k1:_E_[[A "
+    "k2:_E_[[B "
+    "k3:_E_[[C "
+    "k4:_E_[[D "
+    "k5:_E_[[E "
+    "k6:_E_[17~ "
+    "k7:_E_[18~ "
+    "k8:_E_[19~ "
+    "k9:_E_[20~ "
+    "kb:8 "
+    "kD:_E_[3~ "
+    "kP:_E_[5~ "
+    "kN:_E_[6~ "
+    "ti:_E_7_E_[?47h "
+    "te:_E_[2J_E_[?47l_E_8 "
+    "cl:_E_[H_E_[J "
+    + common;
+
   // Error if term is not supported.
   if (data.find (term) == data.end ())
   {
