@@ -1,5 +1,0 @@
-# This script should be deleted once we have a working "make install" target.
-
-cp libvitapi.a /usr/local/lib
-cp vitapi.h    /usr/local/include
-
