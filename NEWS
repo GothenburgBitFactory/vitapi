@@ -17,6 +17,7 @@ and with the following $TERM values:
   * xterm
   * rxvt
   * rxvt-unicode
+  * cygwin
 
 While Vitapi has undergone testing, bugs are sure to remain.  If you
 encounter a bug, please send a message to:
