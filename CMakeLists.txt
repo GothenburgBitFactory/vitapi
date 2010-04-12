@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.8)
 project (vitapi)
 add_subdirectory (src)
-add_subdirectory (examples)
-add_subdirectory (test)
+add_subdirectory (examples EXCLUDE_FROM_ALL)
+add_subdirectory (test EXCLUDE_FROM_ALL)
