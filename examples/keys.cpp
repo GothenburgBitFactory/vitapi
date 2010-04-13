@@ -38,23 +38,11 @@
 
 int main (int argc, char** argv)
 {
+  vapi_initialize (); // For IAPI_RESIZE only.
   iapi_initialize ();
   iapi_raw ();
   iapi_noecho ();
-  iapi_mouse ();
-
-/*
-   ^[[9h       mouse x,y on press on
-   ^[[9l       mouse x,y on press off
-   ^[[1000h    mouse press and release on   + modifier
-   ^[[1000l    mouse press and release off
-   ^[[1001h    mouse highlight tracking on              <-- do not use
-   ^[[1001l    mouse highlight tracking off             <-- do not use
-   ^[[1002h    mouse cell motion tracking on
-   ^[[1002l    mouse cell motion tracking off
-   ^[[1003h    mouse all motion tracking on
-   ^[[1003l    mouse all motion tracking off
-*/
+  iapi_mouse_tracking ();
 
   std::cout << "Press keys to see how IAPI reads and maps them."
             << std::endl
@@ -96,10 +84,21 @@ int main (int argc, char** argv)
     case IAPI_KEY_PGUP:      std::cout << "<PgUp>"      << std::endl; break;
     case IAPI_KEY_PGDN:      std::cout << "<PgDn>"      << std::endl; break;
 
-    case IAPI_MOUSE_1_CLICK: std::cout << "<Mouse1> [" << x << "," << y << "]" << std::endl; break;
-    case IAPI_MOUSE_2_CLICK: std::cout << "<Mouse2> [" << x << "," << y << "]" << std::endl; break;
-    case IAPI_MOUSE_3_CLICK: std::cout << "<Mouse3> [" << x << "," << y << "]" << std::endl; break;
-    case IAPI_MOUSE_RELEASE: std::cout << "<MouseRelease> [" << x << "," << y << "]" << std::endl; break;
+    case IAPI_RESIZE:        std::cout << "<Resize>"    << std::endl; break;
+
+    case IAPI_MOUSE_1_CLICK: std::cout << "<Button1> [" << x << "," << y << "]" << std::endl; break;
+    case IAPI_MOUSE_2_CLICK: std::cout << "<Button2> [" << x << "," << y << "]" << std::endl; break;
+    case IAPI_MOUSE_3_CLICK: std::cout << "<Button3> [" << x << "," << y << "]" << std::endl; break;
+    case IAPI_MOUSE_4_CLICK: std::cout << "<Button4> [" << x << "," << y << "]" << std::endl; break;
+    case IAPI_MOUSE_5_CLICK: std::cout << "<Button5> [" << x << "," << y << "]" << std::endl; break;
+
+    case IAPI_MOUSE_1_MOVE:  std::cout << "<Move1> [" << x << "," << y << "]" << std::endl; break;
+    case IAPI_MOUSE_2_MOVE:  std::cout << "<Move2> [" << x << "," << y << "]" << std::endl; break;
+    case IAPI_MOUSE_3_MOVE:  std::cout << "<Move3> [" << x << "," << y << "]" << std::endl; break;
+    case IAPI_MOUSE_4_MOVE:  std::cout << "<Move4> [" << x << "," << y << "]" << std::endl; break;
+    case IAPI_MOUSE_5_MOVE:  std::cout << "<Move5> [" << x << "," << y << "]" << std::endl; break;
+
+    case IAPI_MOUSE_RELEASE: std::cout << "<Release> [" << x << "," << y << "]" << std::endl; break;
 
     default:
       if (isprint (key))
@@ -113,10 +112,11 @@ int main (int argc, char** argv)
   if (key == 'q') std::cout << "# quit" << std::endl;
   if (key != 'q') std::cout << "# EOF"  << std::endl;
 
-  iapi_nomouse ();
+  iapi_nomouse_tracking ();
   iapi_echo ();
   iapi_noraw ();
   iapi_deinitialize ();
+  vapi_deinitialize ();
 
   return 0;
 }

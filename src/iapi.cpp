@@ -45,7 +45,11 @@
 static struct termios tty;                    // Original I/O state.
 static std::map <int, std::string> sequences; // Key -> sequence mapping.
 static int mouse_x = -1, mouse_y = -1;        // Last known mouse position.
-static int sequence_delay = 10000;            // 10ms delay.
+static bool mouse_control = false;            // Mouse modifier key.
+static bool mouse_meta    = false;            // Mouse modifier key.
+static bool mouse_shift   = false;            // Mouse modifier key.
+static int sequence_delay = 1000;             // 10ms delay.  Note: 1ms reduces
+                                              // missed sequences in translateMouse.
 
 #define MAX_TAPI_SIZE 64                      // Max expected key size.
 
@@ -200,6 +204,27 @@ extern "C" void iapi_mouse_pos (int* x, int* y)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Ctrl key?
+extern "C" int iapi_mouse_control ()
+{
+  return mouse_control ? 1 : 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Meta key?
+extern "C" int iapi_mouse_meta ()
+{
+  return mouse_meta ? 1 : 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Shift key?
+extern "C" int iapi_mouse_shift ()
+{
+  return mouse_shift ? 1 : 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // This routine reads typed characters and translates certain sequences into
 // single key values.  Examples:
 //
@@ -235,67 +260,42 @@ extern "C" void iapi_mouse_pos (int* x, int* y)
 extern "C" int iapi_getch ()
 {
   // An 'ungetchar' buffer for sequences that were read, but not recognized.
-  // This buffer should be depleted before calling getchar again.
-  static std::deque <int> overflow;
-  std::deque <int> sequence;
+  // This buffer should be depleted before calling fgetc again.
+  static std::deque <int> sequence;
+  int key;
 
-  // Get the (first?) char.
-  if (overflow.size ())
+  // Special case: if the sequence is empty, block on fgetc, waiting for at
+  // least one character.
+  if (sequence.size () == 0)
   {
-    sequence.push_back (overflow[0]);
-    overflow.pop_front ();
+/*  TODO Is this the correct way to deal with signals?
+    do
+    {
+      key = fgetc (stdin);
+    }
+    while (key == -1 && errno == EAGAIN);
+*/
+    key = fgetc (stdin);
+    sequence.push_back (key);
+    usleep (sequence_delay);
   }
-  else
-  {
-    // Read one character.
-    int key = fgetc (stdin);
+
+  // Now read all pending characters.
+  usleep (sequence_delay);
+  non_blocking (fileno (stdin));
+
+  while ((key = fgetc (stdin)) > 0)
     sequence.push_back (key);
 
-    // Only do the sequence dance if the first character is <Escape>.
-    if (key == 27)
-    {
-      usleep (sequence_delay);
-
-      non_blocking (fileno (stdin));
-
-      while ((key = fgetc (stdin)) != -1)
-        sequence.push_back (key);
-
-      blocking (fileno (stdin));
-    }
-
-#ifdef USE_OLD_NON_PORTABLE_TECHNIQUE
-    int fd = fileno (stdin);
-    fd_set readset;
-    FD_ZERO (&readset);
-    FD_SET (fd, &readset);
-    if (select (fd + 1, &readset, NULL, NULL, NULL) > 0 &&
-        FD_ISSET (0, &readset))
-    {
-      int quantity;
-#ifdef CYGWIN
-      ioctl (0, TIOCINQ, &quantity);   // This doesn't seem to work on Cygwin.
-#else
-      ioctl (0, FIONREAD, &quantity);
-#endif
-      for (int i = 0; i < quantity; ++i)
-        sequence.push_back (getchar ());
-    }
-#endif
-  }
+  blocking (fileno (stdin));
 
   // Convert sequences into single key values.
   translate (sequence);
   translateMouse (sequence);
 
   // Return the first (perhaps only) key pressed.
-  int key = sequence[0];
+  key = sequence[0];
   sequence.pop_front ();
-
-  // Untranslated keystrokes are sent to overflow.
-  std::deque <int>::iterator it;
-  for (it = sequence.begin (); it != sequence.end (); ++it)
-    overflow.push_back (*it);
 
   return key;
 }
@@ -323,11 +323,53 @@ static void translate (std::deque <int>& sequence)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//    <Escape> [ M b x y
+// TODO Remove most, if not all, of this comment.
 //
-//    b: 000CMSxx
-//    x: 32 + col
-//    y: 32 + row
+// The motion reporting modes are strictly xterm extensions, and are not part of
+// any standard, though they are analogous to the DEC VT200 DECELR locator
+// reports.
+//
+// Normal tracking mode sends an escape sequence on both button press and
+// release. Modifier key (shift, ctrl, meta) information is also sent. It is
+// enabled by specifying parameter 1000 to DECSET. On button press or release,
+// xterm sends CSI M C b C x C y . The low two bits of C b encode button
+// information: 0=MB1 pressed, 1=MB2 pressed, 2=MB3 pressed, 3=release. The next
+// three bits encode the modifiers which were down when the button was pressed
+// and are added together: 4=Shift, 8=Meta, 16=Control. Note however that the
+// shift and control bits are normally unavailable because xterm uses the
+// control modifier with mouse for popup menus, and the shift modifier is used
+// in the default translations for button events. The Meta modifier recognized
+// by xterm is the mod1 mask, and is not necessarily the "Meta" key (see
+// xmodmap). C x and C y are the x and y coordinates of the mouse event, encoded
+// as in X10 mode.
+//
+// Wheel mice may return buttons 4 and 5. Those buttons are represented by the
+// same event codes as buttons 1 and 2 respectively, except that 64 is added to
+// the event code. Release events for the wheel buttons are not reported.
+//
+// Button-event tracking is essentially the same as normal tracking, but xterm
+// also reports button-motion events. Motion events are reported only if the
+// mouse pointer has moved to a different character cell. It is enabled by
+// specifying parameter 1002 to DECSET. On button press or release, xterm sends
+// the same codes used by normal tracking mode. On button-motion events, xterm
+// adds 32 to the event code (the third character, C b ). The other bits of the
+// event code specify button and modifier keys as in normal mode. For example,
+// motion into cell x,y with button 1 down is reported as CSI M @ C x C y .
+// ( @ = 32 + 0 (button 1) + 32 (motion indicator) ). Similarly, motion with
+// button 3 down is reported as CSI M B C x C y . ( B = 32 + 2 (button 3) +
+// 32 (motion indicator) ).
+//
+// Event:
+//    <Escape> [ M b X Y
+//
+//    b: wmCMSxx
+//         w - wheel
+//         m - motion indicator
+//         C - Ctrl
+//         M - Meta
+//         S - Shift
+//    X: 32 + col
+//    Y: 32 + row
 //
 //    xx: 00  b1 pressed
 //        01  b2 pressed
@@ -342,35 +384,54 @@ static void translateMouse (std::deque <int>& sequence)
       sequence[2]      == 'M')
   {
 /*
-    std::cout << "# event "
-              << (sequence[3] & 0x8000 ? 1 : 0)
-              << (sequence[3] & 0x4000 ? 1 : 0)
-              << (sequence[3] & 0x2000 ? 1 : 0)
-              << (sequence[3] & 0x1000 ? 1 : 0)
-              << (sequence[3] & 0x0800 ? 1 : 0)
-              << (sequence[3] & 0x0400 ? 1 : 0)
-              << (sequence[3] & 0x0200 ? 1 : 0)
-              << (sequence[3] & 0x0100 ? 1 : 0)
-              << (sequence[3] & 0x0080 ? 1 : 0)
-              << (sequence[3] & 0x0040 ? 1 : 0)
-              << (sequence[3] & 0x0020 ? 1 : 0)
-              << (sequence[3] & 0x0010 ? 1 : 0)
-              << (sequence[3] & 0x0008 ? 1 : 0)
-              << (sequence[3] & 0x0004 ? 1 : 0)
+    std::cout << "# " << sequence[0]
+              << ' '  << sequence[1]
+              << ' '  << sequence[2]
+              << ' '  << sequence[3]
+              << ' '  << sequence[4]
+              << ' '  << sequence[5]
+              << " = "
+              << (sequence[3] & 0x0040 ? 'w' : '.')  // Wheel (button 4, 5)
+              << (sequence[3] & 0x0020 ? 'm' : '.')  // Motion
+              << (sequence[3] & 0x0010 ? 'C' : '.')  // Ctrl
+              << (sequence[3] & 0x0008 ? 'M' : '.')  // Meta
+              << (sequence[3] & 0x0004 ? 'S' : '.')  // Shift
               << (sequence[3] & 0x0002 ? 1 : 0)
               << (sequence[3] & 0x0001 ? 1 : 0)
               << std::endl;
 */
 
+    // Capture bits.
+    bool wheel   = sequence[3] & 0x40 ? true : false;
+    bool motion  = sequence[3] & 0x20 ? true : false;
+    bool control = sequence[3] & 0x10 ? true : false;
+    bool meta    = sequence[3] & 0x08 ? true : false;
+    bool shift   = sequence[3] & 0x04 ? true : false;
+
+    // Combined button and motion selection.
     int key;
-    switch (sequence[3] & 0x0003)
+    if (motion)
     {
-    case 0: key = IAPI_MOUSE_1_CLICK; break;
-    case 1: key = IAPI_MOUSE_2_CLICK; break;
-    case 2: key = IAPI_MOUSE_3_CLICK; break;
-    case 3: key = IAPI_MOUSE_RELEASE; break;
+      switch (sequence[3] & 0x03)
+      {
+      case 0: key = (wheel ? IAPI_MOUSE_4_MOVE : IAPI_MOUSE_1_MOVE); break;
+      case 1: key = (wheel ? IAPI_MOUSE_5_MOVE : IAPI_MOUSE_2_MOVE); break;
+      case 2: key = IAPI_MOUSE_3_MOVE; break;
+      case 3: key = IAPI_MOUSE_RELEASE; break;
+      }
+    }
+    else
+    {
+      switch (sequence[3] & 0x03)
+      {
+      case 0: key = (wheel ? IAPI_MOUSE_4_CLICK : IAPI_MOUSE_1_CLICK); break;
+      case 1: key = (wheel ? IAPI_MOUSE_5_CLICK : IAPI_MOUSE_2_CLICK); break;
+      case 2: key = IAPI_MOUSE_3_CLICK; break;
+      case 3: key = IAPI_MOUSE_RELEASE; break;
+      }
     }
 
+    // Coordinates.
     mouse_x = sequence[4] - 32;
     mouse_y = sequence[5] - 32;
 

@@ -27,6 +27,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
@@ -35,13 +36,17 @@
 #include <check.h>
 
 static std::stringstream output; // Output buffer
-static int screenWidth  = 80;    // Terminal width
-static int screenHeight = 24;    // Terminal height (may include status line)
 static bool full_screen = false; // Should deinitialize restore?
 static bool has_status  = false; // Terminal has status area
 
+static bool handled = false;     // Latch
+static int screenWidth  = 80;    // Terminal width
+static int screenHeight = 24;    // Terminal height (may include status line)
+
 #define MAX_TAPI_SIZE 64         // Max expected key size.
 
+static void setupSignalHandler ();
+static void restoreSignalHandler ();
 static void getTerminalSize (int&, int&);
 static void handler (int);
 
@@ -50,8 +55,6 @@ static void handler (int);
 extern "C" int vapi_initialize ()
 {
   output.str ("");
-
-  getTerminalSize (screenWidth, screenHeight);
 
   char* term = getenv ("TERM");
   if (term)
@@ -62,12 +65,7 @@ extern "C" int vapi_initialize ()
     tapi_get ("hs", hs, MAX_TAPI_SIZE);
     has_status = hs != "" ? true : false;
 
-    // Handle assorted signals.
-    signal (SIGWINCH, handler);
-    signal (SIGINT,   handler);
-    signal (SIGQUIT,  handler);
-    signal (SIGKILL,  handler);
-
+    setupSignalHandler ();
     return 0;
   }
 
@@ -82,10 +80,7 @@ extern "C" void vapi_deinitialize ()
     vapi_end_full_screen ();
 
   vapi_refresh ();
-  signal (SIGWINCH, SIG_DFL);
-  signal (SIGINT,   SIG_DFL);
-  signal (SIGQUIT,  SIG_DFL);
-  signal (SIGKILL,  SIG_DFL);
+  restoreSignalHandler ();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -231,6 +226,45 @@ extern "C" void vapi_rectangle (int x, int y, int w, int h, color c)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Set the terminal title
+extern "C" void vapi_title (const char* title)
+{
+  CHECK0 (title, "Null pointer passed to vapi_title.");
+
+  char ttl[MAX_TAPI_SIZE];
+  tapi_get_str ("Ttl", ttl, MAX_TAPI_SIZE, title);
+  output << ttl << std::flush;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+static void setupSignalHandler ()
+{
+  if (! handled)
+  {
+    signal (SIGWINCH, handler);
+    signal (SIGINT,   handler);
+    signal (SIGQUIT,  handler);
+    signal (SIGKILL,  handler);
+
+    handled = true;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+static void restoreSignalHandler ()
+{
+  if (handled)
+  {
+    signal (SIGWINCH, SIG_DFL);
+    signal (SIGINT,   SIG_DFL);
+    signal (SIGQUIT,  SIG_DFL);
+    signal (SIGKILL,  SIG_DFL);
+
+    handled = false;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Get the terminal width
 extern "C" int vapi_width ()
 {
@@ -249,17 +283,6 @@ extern "C" int vapi_height ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set the terminal title
-extern "C" void vapi_title (const char* title)
-{
-  CHECK0 (title, "Null pointer passed to vapi_title.");
-
-  char ttl[MAX_TAPI_SIZE];
-  tapi_get_str ("Ttl", ttl, MAX_TAPI_SIZE, title);
-  output << ttl << std::flush;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 static void getTerminalSize (int& w, int& h)
 {
   unsigned short buff[4];
@@ -274,7 +297,11 @@ static void getTerminalSize (int& w, int& h)
 static void handler (int sig)
 {
   if (sig == SIGWINCH)
+  {
     getTerminalSize (screenWidth, screenHeight);
+//    ungetc (0432, stdin);
+    ungetc (65, stdin);
+  }
 
   // NOP for all other (trapped) signals.
 }

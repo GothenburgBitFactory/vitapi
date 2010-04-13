@@ -73,6 +73,13 @@ int main (int argc, char** argv)
       else if (key == IAPI_MOUSE_1_CLICK ||
                key == IAPI_MOUSE_2_CLICK ||
                key == IAPI_MOUSE_3_CLICK ||
+               key == IAPI_MOUSE_4_CLICK ||
+               key == IAPI_MOUSE_5_CLICK ||
+               key == IAPI_MOUSE_1_MOVE  ||
+               key == IAPI_MOUSE_2_MOVE  ||
+               key == IAPI_MOUSE_3_MOVE  ||
+               key == IAPI_MOUSE_4_MOVE  ||
+               key == IAPI_MOUSE_5_MOVE  ||
                key == IAPI_MOUSE_RELEASE)
       {
         iapi_mouse_pos (&mx, &my);
@@ -82,6 +89,9 @@ int main (int argc, char** argv)
       }
     }
 
+    iapi_nomouse_tracking ();
+    iapi_echo ();
+    iapi_noraw ();
     iapi_deinitialize ();
     vapi_deinitialize ();
   }

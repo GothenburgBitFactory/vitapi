@@ -54,9 +54,17 @@
 #define IAPI_MOUSE_1_CLICK 0426
 #define IAPI_MOUSE_2_CLICK 0427
 #define IAPI_MOUSE_3_CLICK 0430
-#define IAPI_MOUSE_RELEASE 0431         // Release of clicked button
+#define IAPI_MOUSE_4_CLICK 0431
+#define IAPI_MOUSE_5_CLICK 0432
+#define IAPI_MOUSE_1_MOVE  0433
+#define IAPI_MOUSE_2_MOVE  0434
+#define IAPI_MOUSE_3_MOVE  0435
+#define IAPI_MOUSE_4_MOVE  0436
+#define IAPI_MOUSE_5_MOVE  0437
+#define IAPI_MOUSE_RELEASE 0440         // Release of clicked button
 
-#define IAPI_KEY_MAXIMUM   0431         // Highest value for synthetic key
+#define IAPI_RESIZE        0441         // Terminal resize
+#define IAPI_KEY_MAXIMUM   0441         // Highest value for synthetic key
 
 // color - color API
 #define _COLOR_256       0x00200000     // 256-color mode
@@ -98,6 +106,9 @@ void iapi_nomouse ();                    // Disable mouse clicks
 void iapi_mouse_tracking ();             // Enable mouse clicks and tracking
 void iapi_nomouse_tracking ();           // Disable mouse clicks and tracking
 void iapi_mouse_pos (int*, int*);        // Get last known mouse position
+int  iapi_mouse_control ();              // Ctrl key?
+int  iapi_mouse_meta ();                 // Meta key?
+int  iapi_mouse_shift ();                // Shift key?
 int  iapi_getch ();                      // Get processed input
 
 // vapi - visual primitives API
