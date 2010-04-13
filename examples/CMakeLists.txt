@@ -1,5 +1,5 @@
 include_directories (${CMAKE_SOURCE_DIR}/src) 
-set (EXAMPLE_PRGS drag keys rectangles speed chessboard test_pattern)
+set (EXAMPLE_PRGS drag keys rectangles speed chessboard test_pattern ninemensmorris)
 add_custom_target (examples DEPENDS ${EXAMPLE_PRGS})
 foreach (EXAMPLE_PRG ${EXAMPLE_PRGS})
   set (EXAMPLE_SRC "${EXAMPLE_PRG}.cpp")
