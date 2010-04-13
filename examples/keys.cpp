@@ -43,6 +43,19 @@ int main (int argc, char** argv)
   iapi_noecho ();
   iapi_mouse ();
 
+/*
+   ^[[9h       mouse x,y on press on
+   ^[[9l       mouse x,y on press off
+   ^[[1000h    mouse press and release on   + modifier
+   ^[[1000l    mouse press and release off
+   ^[[1001h    mouse highlight tracking on              <-- do not use
+   ^[[1001l    mouse highlight tracking off             <-- do not use
+   ^[[1002h    mouse cell motion tracking on
+   ^[[1002l    mouse cell motion tracking off
+   ^[[1003h    mouse all motion tracking on
+   ^[[1003l    mouse all motion tracking off
+*/
+
   std::cout << "Press keys to see how IAPI reads and maps them."
             << std::endl
             << "Press 'q' to quit."
