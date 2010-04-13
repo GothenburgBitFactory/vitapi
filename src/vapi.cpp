@@ -65,6 +65,7 @@ extern "C" int vapi_initialize ()
     tapi_get ("hs", hs, MAX_TAPI_SIZE);
     has_status = hs != "" ? true : false;
 
+    getTerminalSize (screenWidth, screenHeight);
     setupSignalHandler ();
     return 0;
   }
@@ -288,8 +289,8 @@ static void getTerminalSize (int& w, int& h)
   unsigned short buff[4];
   if (ioctl (0, TIOCGWINSZ, &buff) != -1)
   {
-    screenHeight = buff[0];
-    screenWidth  = buff[1];
+    h = buff[0];
+    w = buff[1];
   }
 }
 
