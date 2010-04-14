@@ -36,6 +36,7 @@ void vitapi_set_error (const std::string&);
 #define CHECKC1(arg,msg) if ((arg) == -1)               {vitapi_set_error (msg); return -1;}
 #define CHECKX0(x,msg)   if ((x)<1 || (x)>screenWidth)  {vitapi_set_error (msg); return;}
 #define CHECKY0(y,msg)   if ((y)<1 || (y)>screenHeight) {vitapi_set_error (msg); return;}
+#define CHECKW0(w,msg)   if ((w)<1)                     {vitapi_set_error (msg); return;}
 
 #endif
 ////////////////////////////////////////////////////////////////////////////////
