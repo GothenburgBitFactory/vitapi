@@ -30,7 +30,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 int main (int argc, char** argv)
 {
-  UnitTest t (56);
+  UnitTest t (48);
 
   char error [256];
 
@@ -165,30 +165,10 @@ int main (int argc, char** argv)
   t.is (error, "Null pointer passed to vapi_pos_text.",
                "vapi_pos_text: NULL pointer");
 
-  vapi_pos_text (0, 1, "foo");
-  vitapi_error (error, 256);
-  t.is (error, "Invalid x coordinate passed to vapi_pos_text.",
-               "vapi_pos_text: NULL pointer");
-
-  vapi_pos_text (1, 0, "foo");
-  vitapi_error (error, 256);
-  t.is (error, "Invalid y coordinate passed to vapi_pos_text.",
-               "vapi_pos_text: NULL pointer");
-
   // vapi_pos_color_text
   vapi_pos_color_text (1, 1, 0, NULL);
   vitapi_error (error, 256);
   t.is (error, "Null pointer passed to vapi_pos_color_text.",
-               "vapi_pos_color_text: NULL pointer");
-
-  vapi_pos_color_text (0, 1, 0, "foo");
-  vitapi_error (error, 256);
-  t.is (error, "Invalid x coordinate passed to vapi_pos_color_text.",
-               "vapi_pos_color_text: NULL pointer");
-
-  vapi_pos_color_text (1, 0, 0, "foo");
-  vitapi_error (error, 256);
-  t.is (error, "Invalid y coordinate passed to vapi_pos_color_text.",
                "vapi_pos_color_text: NULL pointer");
 
   vapi_pos_color_text (1, 1, -1, "foo");
@@ -201,26 +181,6 @@ int main (int argc, char** argv)
   vitapi_error (error, 256);
   t.is (error, "Invalid color passed to vapi_rectangle.",
                "vapi_rectangle: Invalid color");
-
-  vapi_rectangle (0, 1, 10, 10, 0);
-  vitapi_error (error, 256);
-  t.is (error, "Invalid x coordinate passed to vapi_rectangle.",
-               "vapi_rectangle: Invalid x coordinate");
-
-  vapi_rectangle (1, 0, 10, 10, 0);
-  vitapi_error (error, 256);
-  t.is (error, "Invalid y coordinate passed to vapi_rectangle.",
-               "vapi_rectangle: Invalid x coordinate");
-
-  vapi_rectangle (1, 1, 0, 10, 0);
-  vitapi_error (error, 256);
-  t.is (error, "Invalid width passed to vapi_rectangle.",
-               "vapi_rectangle: Invalid width");
-
-  vapi_rectangle (1, 1, 10, 0, 0);
-  vitapi_error (error, 256);
-  t.is (error, "Invalid height passed to vapi_rectangle.",
-               "vapi_rectangle: Invalid height");
 
   // vapi_title
   vapi_title (NULL);
