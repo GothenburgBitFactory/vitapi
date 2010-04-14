@@ -39,7 +39,6 @@ int main (int argc, char** argv)
 
     color black = color_def ("on bright black");
     color white = color_def ("on bright white");
-    std::cout << black << std::endl << white << std::endl;
 
     int origin_x = (vapi_width ()  - 8 * 3 * 2) / 2;
     int origin_y = (vapi_height () - 8 * 3)     / 2;
