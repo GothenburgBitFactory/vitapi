@@ -110,6 +110,7 @@ int  iapi_mouse_control ();              // Ctrl key?
 int  iapi_mouse_meta ();                 // Meta key?
 int  iapi_mouse_shift ();                // Shift key?
 int  iapi_getch ();                      // Get processed input
+int  iapi_set_delay (int);               // Delay between related keypresses
 
 // vapi - visual primitives API
 int  vapi_initialize ();                 // Initialize visual processing
