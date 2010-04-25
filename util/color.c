@@ -16,11 +16,11 @@ int main (int argc, char** argv)
   }
   else if (argc == 2 && !strcmp (argv[1], "all"))
   {
-    // TODO "./color all"                       -> rainbow
-    printf ("rainbow\n");
-    printf ("\nBasic colors\n");
-
     char sample[128];
+    char def[128];
+    int r, g, b, c;
+
+    printf ("\nBasic colors\n");
     strcpy (sample, " black ");   color_colorize (sample, 128, color_def ("black"));   printf (" %s", sample);
     strcpy (sample, " red ");     color_colorize (sample, 128, color_def ("red"));     printf (" %s", sample);
     strcpy (sample, " blue ");    color_colorize (sample, 128, color_def ("blue"));    printf (" %s", sample);
@@ -38,126 +38,96 @@ int main (int argc, char** argv)
     strcpy (sample, " cyan ");    color_colorize (sample, 128, color_def ("black on cyan"));    printf (" %s", sample);
     strcpy (sample, " yellow ");  color_colorize (sample, 128, color_def ("black on yellow"));  printf (" %s", sample);
     strcpy (sample, " white ");   color_colorize (sample, 128, color_def ("black on white"));   printf (" %s", sample);
-    printf ("\n\n");
 
-    printf ("\nBasic colors\n");
-/*
-        out << std::endl
-            << "Basic colors"
-            << std::endl
-            << " " << Color::colorize (" black ",   "black")
-            << " " << Color::colorize (" red ",     "red")
-            << " " << Color::colorize (" blue ",    "blue")
-            << " " << Color::colorize (" green ",   "green")
-            << " " << Color::colorize (" magenta ", "magenta")
-            << " " << Color::colorize (" cyan ",    "cyan")
-            << " " << Color::colorize (" yellow ",  "yellow")
-            << " " << Color::colorize (" white ",   "white")
-            << std::endl
-            << " " << Color::colorize (" black ",   "white on black")
-            << " " << Color::colorize (" red ",     "white on red")
-            << " " << Color::colorize (" blue ",    "white on blue")
-            << " " << Color::colorize (" green ",   "black on green")
-            << " " << Color::colorize (" magenta ", "black on magenta")
-            << " " << Color::colorize (" cyan ",    "black on cyan")
-            << " " << Color::colorize (" yellow ",  "black on yellow")
-            << " " << Color::colorize (" white ",   "black on white")
-            << std::endl
-            << std::endl;
+    printf ("\n\nEffects\n");
+    strcpy (sample, " red ");  color_colorize (sample, 128, color_def ("red"));  printf (" %s", sample);
+    strcpy (sample, " bold red ");  color_colorize (sample, 128, color_def ("bold red"));  printf (" %s", sample);
+    strcpy (sample, " underline on blue ");  color_colorize (sample, 128, color_def ("underline on blue"));  printf (" %s", sample);
+    strcpy (sample, " on green ");  color_colorize (sample, 128, color_def ("black on green"));  printf (" %s", sample);
+    strcpy (sample, " on bright green ");  color_colorize (sample, 128, color_def ("black on bright green"));  printf (" %s", sample);
 
-        out << "Effects"
-            << std::endl
-            << " " << Color::colorize (" red ",               "red")
-            << " " << Color::colorize (" bold red ",          "bold red")
-            << " " << Color::colorize (" underline on blue ", "underline on blue")
-            << " " << Color::colorize (" on green ",          "black on green")
-            << " " << Color::colorize (" on bright green ",   "black on bright green")
-            << std::endl
-            << std::endl;
+    // 16 system colors.
+    printf ("\n\ncolor0 - color15\n  0 1 2 . . .\n");
+    for (r = 0; r < 2; ++r)
+    {
+      printf ("  ");
+      for (c = 0; c < 8; ++c)
+      {
+        sprintf (def, "on color%d", (r*8 + c));
+        strcpy (sample, "  ");
+        color_colorize (sample, 128, color_def (def));
+        printf ("%s", sample);
+      }
 
-        // 16 system colors.
-        out << "color0 - color15"
-            << std::endl
-            << "  0 1 2 . . ."
-            << std::endl;
-        for (int r = 0; r < 2; ++r)
+      printf ("\n");
+    }
+
+    printf ("          . . . 15\n");
+
+    // Color cube.
+    printf ("\nColor cube rgb");
+    strcpy (sample, "0");  color_colorize (sample, 128, color_def ("red")); printf ("%s", sample);
+    strcpy (sample, "0");  color_colorize (sample, 128, color_def ("green")); printf ("%s", sample);
+    strcpy (sample, "0");  color_colorize (sample, 128, color_def ("blue")); printf ("%s", sample);
+    printf (" - rgb");
+    strcpy (sample, "0");  color_colorize (sample, 128, color_def ("red")); printf ("%s", sample);
+    strcpy (sample, "0");  color_colorize (sample, 128, color_def ("green")); printf ("%s", sample);
+    strcpy (sample, "0");  color_colorize (sample, 128, color_def ("blue")); printf ("%s", sample);
+    printf (" (also color16 - color231)\n");
+
+    strcpy (sample, "0            "
+                    "1            "
+                    "2            "
+                    "3            "
+                    "4            "
+                    "5");
+    color_colorize (sample, 128, color_def ("bold red"));
+    printf ("  %s\n", sample);
+
+    strcpy (sample, "0 1 2 3 4 5  "
+                    "0 1 2 3 4 5  "
+                    "0 1 2 3 4 5  "
+                    "0 1 2 3 4 5  "
+                    "0 1 2 3 4 5  "
+                    "0 1 2 3 4 5");
+    color_colorize (sample, 128, color_def ("bold blue"));
+    printf ("  %s\n", sample);
+
+    for (g = 0; g < 6; ++g)
+    {
+      sprintf (sample, " %d", g);
+      color_colorize (sample, 128, color_def ("bold green"));
+      printf ("%s", sample);
+
+      for (r = 0; r < 6; ++r)
+      {
+        for (b = 0; b < 6; ++b)
         {
-          out << "  ";
-          for (int c = 0; c < 8; ++c)
-          {
-            std::stringstream s;
-            s << "on color" << (r*8 + c);
-            out << Color::colorize ("  ", s.str ());
-          }
-
-          out << std::endl;
+          sprintf (def, "on rgb%d%d%d", r, g, b);
+          strcpy (sample, "  ");
+          color_colorize (sample, 128, color_def (def));
+          printf ("%s", sample);
         }
 
-        out << "          . . . 15"
-            << std::endl
-            << std::endl;
+        printf (" ");
+      }
 
-        // Color cube.
-        out << "Color cube rgb"
-            << Color::colorize ("0", "bold red")
-            << Color::colorize ("0", "bold green")
-            << Color::colorize ("0", "bold blue")
-            << " - rgb"
-            << Color::colorize ("5", "bold red")
-            << Color::colorize ("5", "bold green")
-            << Color::colorize ("5", "bold blue")
-            << " (also color16 - color231)"
-            << std::endl
-            << "  " << Color::colorize ("0            "
-                                        "1            "
-                                        "2            "
-                                        "3            "
-                                        "4            "
-                                        "5", "bold red")
-            << std::endl
-            << "  " << Color::colorize ("0 1 2 3 4 5  "
-                                        "0 1 2 3 4 5  "
-                                        "0 1 2 3 4 5  "
-                                        "0 1 2 3 4 5  "
-                                        "0 1 2 3 4 5  "
-                                        "0 1 2 3 4 5", "bold blue")
-            << std::endl;
+      printf ("\n");
+    }
 
-        char label [12];
-        for (int g = 0; g < 6; ++g)
-        {
-          sprintf (label, " %d", g);
-          out << Color::colorize (label, "bold green");
-          for (int r = 0; r < 6; ++r)
-          {
-            for (int b = 0; b < 6; ++b)
-            {
-              std::stringstream s;
-              s << "on rgb" << r << g << b;
-              out << Color::colorize ("  ", s.str ());
-            }
+    // Grey ramp.
+    printf ("\nGray ramp gray0 - gray23 (also color232 - color255)\n"
+            "  0 1 2 . . .                             . . . 23\n  ");
 
-            out << " ";
-          }
+    for (g = 0; g < 24; ++g)
+    {
+      sprintf (def, "on gray%d", g);
+      strcpy (sample, "  ");
+      color_colorize (sample, 128, color_def (def));
+      printf ("%s", sample);
+    }
 
-          out << std::endl;
-        }
-
-        out << std::endl;
-
-        // Grey ramp.
-        out << "Gray ramp gray0 - gray23 (also color232 - color255)"
-            << std::endl
-            << "  0 1 2 . . .                             . . . 23"
-            << std::endl
-            << "  ";
-        for (int g = 0; g < 24; ++g)
-        {
-          std::stringstream s;
-          s << "on gray" << g;
-          out << Color::colorize ("  ", s.str ());
-        }
-*/
+    printf ("\n");
   }
   else
   {
