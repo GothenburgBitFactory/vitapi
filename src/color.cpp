@@ -267,8 +267,16 @@ extern "C" void color_decode (char* buf, size_t size, color c)
   description << ((c & _COLOR_BRIGHT)    ? "BR-"  : "-");
 
   int bg = (c & _COLOR_BG) >> 8;
+  if (c & _COLOR_HASBG)
+    description << bg;
+  else
+    description << "-";
+
   int fg = c & _COLOR_FG;
-  description << bg << "-" << fg;
+  if (c & _COLOR_HASFG)
+    description << fg;
+  else
+    description << "-";
 
   if (description.str ().length () + 1 >= size)
   {
