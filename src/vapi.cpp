@@ -335,7 +335,7 @@ extern "C" int vapi_height ()
 static void getTerminalSize (int& w, int& h)
 {
   unsigned short buff[4];
-  if (ioctl (0, TIOCGWINSZ, &buff) != -1)
+  if (ioctl (fileno(stdout), TIOCGWINSZ, &buff) != -1)
   {
     h = buff[0];
     w = buff[1];
