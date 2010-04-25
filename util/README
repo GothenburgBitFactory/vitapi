@@ -9,7 +9,8 @@ like this:
     $ TERM=xterm-256color ./termdef
     ...
 
-Currently, these are the only three terminal types planned to be supported.
+The number of terminal types supported will be kept to a minimum, but provisions
+in the API allow for user-specified types.
 
 The termdef utility is not intended to be part of the regular build, because it
 depends on ncurses, which is not a dependency that we want.
