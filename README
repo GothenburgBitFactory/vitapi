@@ -1,12 +1,13 @@
-Vitapi - Visual, Input and Terminal API for interacting with modern terminals.
+Vitapi - Visual, Input and Terminal API for simple interaction with modern
+terminals.
 
 Vitapi is a library that provides routines that can read keyboard input and
 interact with your terminal to provide support for building a character-based
 UI.  It supports the mouse and 256 colors.
 
 
-Q: Shouldn't I just use curses/ncurses instead?
-A: Perhaps you should.  Vitapi is a lightweight replacement for some of the
+Q: Should I just use curses/ncurses instead?
+A: Perhaps you should.  Vitapi is a lightweight replacement for only some of the
    basic ncurses features, without the legacy terminal support, and with a nice
    color model that includes 256 color support.
 

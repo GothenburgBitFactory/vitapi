@@ -88,6 +88,7 @@ typedef int color;
 
 color color_def (const char*);           // Parse definition: "red on white"
 void  color_name (char*, size_t, color); // Convert a color -> description
+void  color_decode (char*, size_t, color); // Convert a color -> bits
 color color_upgrade (color);             // Convert 16- to 256-color
 color color_downgrade (color);           // Convert 256- to 16-color, with loss
 color color_blend (color, color);        // Blend two colors, possible upgrade

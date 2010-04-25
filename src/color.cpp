@@ -251,6 +251,35 @@ extern "C" void color_name (char* buf, size_t size, color c)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Convert a color -> bit description
+extern "C" void color_decode (char* buf, size_t size, color c)
+{
+  CHECK0 (buf, "Null buffer pointer passed to color_decode.");
+  CHECKC0 (c,  "Invalid color passed to color_decode.");
+
+  std::stringstream description;
+
+  description << ((c & _COLOR_256)       ? "256-" : "-");
+  description << ((c & _COLOR_HASBG)     ? "BG-"  : "-");
+  description << ((c & _COLOR_HASFG)     ? "FG-"  : "-");
+  description << ((c & _COLOR_UNDERLINE) ? "U-"   : "-");
+  description << ((c & _COLOR_BOLD)      ? "BO-"  : "-");
+  description << ((c & _COLOR_BRIGHT)    ? "BR-"  : "-");
+
+  int bg = (c & _COLOR_BG) >> 8;
+  int fg = c & _COLOR_FG;
+  description << bg << "-" << fg;
+
+  if (description.str ().length () + 1 >= size)
+  {
+    vitapi_set_error ("Insufficient buffer size passed to color_decode.");
+    return;
+  }
+
+  strncpy (buf, description.str ().c_str (), size);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Convert 16- to 256-color
 extern "C" color color_upgrade (color c)
 {
