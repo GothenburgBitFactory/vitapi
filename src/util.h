@@ -54,6 +54,7 @@ std::string trimRight (const std::string& in, const std::string& t = " ");
 std::string trim (const std::string& in, const std::string& t = " ");
 std::string lowerCase (const std::string&);
 int autoComplete (const std::string&, const std::vector<std::string>&, std::vector<std::string>&);
+bool digitsOnly (const std::string&);
 
 #endif
 ////////////////////////////////////////////////////////////////////////////////

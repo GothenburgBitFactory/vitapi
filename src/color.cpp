@@ -66,6 +66,11 @@ extern "C" color color_def (const char* def)
   // The color that is being constructed.
   color c = 0;
 
+  // Special case - if def contains only digits, then consider it a color code
+  // that is in string form, and simply convert it using atoi.
+  if (digitsOnly (def))
+    return atoi (def);
+
   // By converting underscores to spaces, we inherently support the old "on_red"
   // style of specifying background colors.  We consider underscores to be
   // deprecated.

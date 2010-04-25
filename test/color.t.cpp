@@ -33,7 +33,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 int main (int argc, char** argv)
 {
-  UnitTest t (1026);
+  UnitTest t (1027);
 
   // Auto upgrades.
   char value [256];
@@ -214,6 +214,15 @@ int main (int argc, char** argv)
     color_colorize (value, 256, color_def (color));
     t.is (value, codes, description);
   }
+
+  // Test color_def ("123456789") which, in combination with color_name can
+  // be tested via round-trip conversion.
+  strcpy (description, "bold underline red on bright yellow");
+  c = color_def (description);
+  sprintf (value, "%d", c);
+  c = color_def (value);
+  color_name (value, 256, c);
+  t.is (value, description, "round-trip");
 
   return 0;
 }
