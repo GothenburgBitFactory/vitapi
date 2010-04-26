@@ -38,46 +38,37 @@ int main (int argc, char** argv)
   // Auto upgrades.
   char value [256];
   color c = color_def ("red on color0");
-  color_name (value, 256, c);
-  t.is (value, "color1 on color0", "upgrade red on color0 -> color1 on color0");
+  t.is (color_name (value, 256, c), "color1 on color0", "upgrade red on color0 -> color1 on color0");
 
   c = color_def ("color1 on black");
-  color_name (value, 256, c);
-  t.is (value, "color1 on color0", "upgrade color1 on black -> color1 on color0");
+  t.is (color_name (value, 256, c), "color1 on color0", "upgrade color1 on black -> color1 on color0");
 
   c = color_def ("bold red on color0");
-  color_name (value, 256, c);
-  t.is (value, "color9 on color0", "upgrade bold red on color0 -> color9 on color0");
+  t.is (color_name (value, 256, c), "color9 on color0", "upgrade bold red on color0 -> color9 on color0");
 
   c = color_def ("color1 on bright black");
-  color_name (value, 256, c);
-  t.is (value, "color1 on color8", "upgrade color1 on bright black -> color1 on color8");
+  t.is (color_name (value, 256, c), "color1 on color8", "upgrade color1 on bright black -> color1 on color8");
 
   // Simple blending.
   c = color_blend (color_def ("red"), color_def ("on white"));
-  color_name (value, 256, c);
-  t.is (value, "red on white", "red + on white -> red on white");
+  t.is (color_name (value, 256, c), "red on white", "red + on white -> red on white");
 
   c = color_blend (color_def ("bold underline red"), color_def ("on bright white"));
-  color_name (value, 256, c);
-  t.is (value, "bold underline red on bright white", "bold underline red + on bright white -> bold underline red on bright white");
+  t.is (color_name (value, 256, c), "bold underline red on bright white", "bold underline red + on bright white -> bold underline red on bright white");
 
   t.is (color_blend (color_def ("red"), -1), color_def ("red"), "blend red, -1 -> red");
   t.is (color_blend (-1, color_def ("red")), color_def ("red"), "blend -1, red, -> red");
 
   // Blending with conflicts.
   c = color_blend (color_def ("red on white"), color_def ("on blue"));
-  color_name (value, 256, c);
-  t.is (value, "red on blue", "red on white + on blue -> red on blue");
+  t.is (color_name (value, 256, c), "red on blue", "red on white + on blue -> red on blue");
 
   c = color_blend (color_def ("red on white"), color_def ("blue on magenta"));
-  color_name (value, 256, c);
-  t.is (value, "blue on magenta", "red on white + blue on magenta -> blue on magenta");
+  t.is (color_name (value, 256, c), "blue on magenta", "red on white + blue on magenta -> blue on magenta");
 
   // Blending with upgrades.
   c = color_blend (color_def ("color1 on color0"), color_def ("blue"));
-  color_name (value, 256, c);
-  t.is (value, "color4 on color0", "color1 on color0 + blue -> color4 on color0");
+  t.is (color_name (value, 256, c), "color4 on color0", "color1 on color0 + blue -> color4 on color0");
 
   // Now the dumb show of every color and its code.
   strcpy (value, "foo"); color_colorize (value, 256, color_def ("red"));
@@ -109,7 +100,6 @@ int main (int argc, char** argv)
   t.is (value, "\033[36mfoo\033[0m",     "cyan                 -> ^[[36m");
   strcpy (value, "foo"); color_colorize (value, 256, color_def ("white"));
   t.is (value, "\033[37mfoo\033[0m",     "white                -> ^[[37m");
-
 
   // 16-color backgrounds.
   strcpy (value, "foo"); color_colorize (value, 256, color_def ("on bright black"));
@@ -221,8 +211,7 @@ int main (int argc, char** argv)
   c = color_def (description);
   sprintf (value, "%d", c);
   c = color_def (value);
-  color_name (value, 256, c);
-  t.is (value, description, "round-trip");
+  t.is (color_name (value, 256, c), description, "round-trip");
 
   return 0;
 }

@@ -87,12 +87,12 @@ extern "C"
 typedef int color;
 
 color color_def (const char*);           // Parse definition: "red on white"
-void  color_name (char*, size_t, color); // Convert a color -> description
-void  color_decode (char*, size_t, color); // Convert a color -> bits
+const char* color_name (char*, size_t, color); // Convert a color -> description
+const char* color_decode (char*, size_t, color); // Convert a color -> bits
 color color_upgrade (color);             // Convert 16- to 256-color
 color color_downgrade (color);           // Convert 256- to 16-color, with loss
 color color_blend (color, color);        // Blend two colors, possible upgrade
-void  color_colorize (char*, size_t, color);
+const char* color_colorize (char*, size_t, color);
                                          // Colorize a string
 
 // iapi - input processing API
@@ -139,11 +139,11 @@ void vapi_title (const char*);           // Set the terminal title
 int  tapi_initialize (const char*);      // Initialize terminal caps
 void tapi_add (const char*, const char*);
                                          // Provide new terminal configuration
-void tapi_get (const char*, char*, size_t);
+const char* tapi_get (const char*, char*, size_t);
                                          // Get control string
-void tapi_get_xy (const char*, char*, size_t, int, int);
+const char* tapi_get_xy (const char*, char*, size_t, int, int);
                                          // Get control string with x,y subst
-void tapi_get_str (const char*, char*, size_t, const char*);
+const char* tapi_get_str (const char*, char*, size_t, const char*);
                                          // Get control string with string subst
 
 // error messages.

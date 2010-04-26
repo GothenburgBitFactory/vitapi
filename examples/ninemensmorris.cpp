@@ -51,23 +51,23 @@ int main (int argc, char** argv)
     int j = 0;
     int i = 0;
 
-    vapi_rectangle (origin_x +  0, origin_y +  0, 56, 1, line); 
+    vapi_rectangle (origin_x +  0, origin_y +  0, 56, 1, line);
     vapi_rectangle (origin_x +  9, origin_y +  4, 38, 1, line);
     vapi_rectangle (origin_x + 18, origin_y +  8, 20, 1, line);
     vapi_rectangle (origin_x + 18, origin_y + 16, 20, 1, line);
     vapi_rectangle (origin_x +  9, origin_y + 20, 38, 1, line);
-    vapi_rectangle (origin_x +  0, origin_y + 24, 56, 1, line); 
-    
+    vapi_rectangle (origin_x +  0, origin_y + 24, 56, 1, line);
+
     vapi_rectangle (origin_x +  0, origin_y + 12, 20, 1, line);
     vapi_rectangle (origin_x + 36, origin_y + 12, 20, 1, line);
 
-    vapi_rectangle (origin_x +  0, origin_y +  0, 2, 25, line); 
+    vapi_rectangle (origin_x +  0, origin_y +  0, 2, 25, line);
     vapi_rectangle (origin_x +  9, origin_y +  4, 2, 17, line);
     vapi_rectangle (origin_x + 18, origin_y +  8, 2,  9, line);
     vapi_rectangle (origin_x + 36, origin_y +  8, 2,  9, line);
     vapi_rectangle (origin_x + 45, origin_y +  4, 2, 17, line);
-    vapi_rectangle (origin_x + 54, origin_y +  0, 2, 25, line); 
-    
+    vapi_rectangle (origin_x + 54, origin_y +  0, 2, 25, line);
+
     vapi_rectangle (origin_x + 27, origin_y +  0, 2,  9, line);
     vapi_rectangle (origin_x + 27, origin_y + 16, 2,  9, line);
 
@@ -78,7 +78,7 @@ int main (int argc, char** argv)
     for (i = 18; i <= 36; i+=9)
       vapi_rectangle (origin_x + i, origin_y +  8, 2,  1, point);
     for (i =  0; i <= 18; i+=9)
-    {  
+    {
       vapi_rectangle (origin_x + i     , origin_y + 12, 2,  1, point);
       vapi_rectangle (origin_x + i + 36, origin_y + 12, 2,  1, point);
     }

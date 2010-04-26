@@ -58,30 +58,30 @@ int main (int argc, char** argv)
     int r, g, b, c;
 
     printf ("\nBasic colors\n");
-    strcpy (sample, " black ");   color_colorize (sample, 128, color_def ("black"));   printf (" %s", sample);
-    strcpy (sample, " red ");     color_colorize (sample, 128, color_def ("red"));     printf (" %s", sample);
-    strcpy (sample, " blue ");    color_colorize (sample, 128, color_def ("blue"));    printf (" %s", sample);
-    strcpy (sample, " green ");   color_colorize (sample, 128, color_def ("green"));   printf (" %s", sample);
-    strcpy (sample, " magenta "); color_colorize (sample, 128, color_def ("magenta")); printf (" %s", sample);
-    strcpy (sample, " cyan ");    color_colorize (sample, 128, color_def ("cyan"));    printf (" %s", sample);
-    strcpy (sample, " yellow ");  color_colorize (sample, 128, color_def ("yellow"));  printf (" %s", sample);
-    strcpy (sample, " white ");   color_colorize (sample, 128, color_def ("white"));   printf (" %s", sample);
+    strcpy (sample, " black ");   printf (" %s", color_colorize (sample, 128, color_def ("black")));
+    strcpy (sample, " red ");     printf (" %s", color_colorize (sample, 128, color_def ("red")));
+    strcpy (sample, " blue ");    printf (" %s", color_colorize (sample, 128, color_def ("blue")));
+    strcpy (sample, " green ");   printf (" %s", color_colorize (sample, 128, color_def ("green")));
+    strcpy (sample, " magenta "); printf (" %s", color_colorize (sample, 128, color_def ("magenta")));
+    strcpy (sample, " cyan ");    printf (" %s", color_colorize (sample, 128, color_def ("cyan")));
+    strcpy (sample, " yellow ");  printf (" %s", color_colorize (sample, 128, color_def ("yellow")));
+    strcpy (sample, " white ");   printf (" %s", color_colorize (sample, 128, color_def ("white")));
     printf ("\n");
-    strcpy (sample, " black ");   color_colorize (sample, 128, color_def ("white on black"));   printf (" %s", sample);
-    strcpy (sample, " red ");     color_colorize (sample, 128, color_def ("white on red"));     printf (" %s", sample);
-    strcpy (sample, " blue ");    color_colorize (sample, 128, color_def ("white on blue"));    printf (" %s", sample);
-    strcpy (sample, " green ");   color_colorize (sample, 128, color_def ("black on green"));   printf (" %s", sample);
-    strcpy (sample, " magenta "); color_colorize (sample, 128, color_def ("black on magenta")); printf (" %s", sample);
-    strcpy (sample, " cyan ");    color_colorize (sample, 128, color_def ("black on cyan"));    printf (" %s", sample);
-    strcpy (sample, " yellow ");  color_colorize (sample, 128, color_def ("black on yellow"));  printf (" %s", sample);
-    strcpy (sample, " white ");   color_colorize (sample, 128, color_def ("black on white"));   printf (" %s", sample);
+    strcpy (sample, " black ");   printf (" %s", color_colorize (sample, 128, color_def ("white on black")));
+    strcpy (sample, " red ");     printf (" %s", color_colorize (sample, 128, color_def ("white on red")));
+    strcpy (sample, " blue ");    printf (" %s", color_colorize (sample, 128, color_def ("white on blue")));
+    strcpy (sample, " green ");   printf (" %s", color_colorize (sample, 128, color_def ("black on green")));
+    strcpy (sample, " magenta "); printf (" %s", color_colorize (sample, 128, color_def ("black on magenta")));
+    strcpy (sample, " cyan ");    printf (" %s", color_colorize (sample, 128, color_def ("black on cyan")));
+    strcpy (sample, " yellow ");  printf (" %s", color_colorize (sample, 128, color_def ("black on yellow")));
+    strcpy (sample, " white ");   printf (" %s", color_colorize (sample, 128, color_def ("black on white")));
 
     printf ("\n\nEffects\n");
-    strcpy (sample, " red ");  color_colorize (sample, 128, color_def ("red"));  printf (" %s", sample);
-    strcpy (sample, " bold red ");  color_colorize (sample, 128, color_def ("bold red"));  printf (" %s", sample);
-    strcpy (sample, " underline on blue ");  color_colorize (sample, 128, color_def ("underline on blue"));  printf (" %s", sample);
-    strcpy (sample, " on green ");  color_colorize (sample, 128, color_def ("black on green"));  printf (" %s", sample);
-    strcpy (sample, " on bright green ");  color_colorize (sample, 128, color_def ("black on bright green"));  printf (" %s", sample);
+    strcpy (sample, " red ");                printf (" %s", color_colorize (sample, 128, color_def ("red")));
+    strcpy (sample, " bold red ");           printf (" %s", color_colorize (sample, 128, color_def ("bold red")));
+    strcpy (sample, " underline on blue ");  printf (" %s", color_colorize (sample, 128, color_def ("underline on blue")));
+    strcpy (sample, " on green ");           printf (" %s", color_colorize (sample, 128, color_def ("black on green")));
+    strcpy (sample, " on bright green ");    printf (" %s", color_colorize (sample, 128, color_def ("black on bright green")));
 
     // 16 system colors.
     printf ("\n\ncolor0 - color15\n  0 1 2 . . .\n");
@@ -92,8 +92,7 @@ int main (int argc, char** argv)
       {
         sprintf (def, "on color%d", (r*8 + c));
         strcpy (sample, "  ");
-        color_colorize (sample, 128, color_def (def));
-        printf ("%s", sample);
+        printf ("%s", color_colorize (sample, 128, color_def (def)));
       }
 
       printf ("\n");
@@ -103,13 +102,13 @@ int main (int argc, char** argv)
 
     // Color cube.
     printf ("\nColor cube rgb");
-    strcpy (sample, "0");  color_colorize (sample, 128, color_def ("red")); printf ("%s", sample);
-    strcpy (sample, "0");  color_colorize (sample, 128, color_def ("green")); printf ("%s", sample);
-    strcpy (sample, "0");  color_colorize (sample, 128, color_def ("blue")); printf ("%s", sample);
+    strcpy (sample, "0");  printf ("%s", color_colorize (sample, 128, color_def ("red")));
+    strcpy (sample, "0");  printf ("%s", color_colorize (sample, 128, color_def ("green")));
+    strcpy (sample, "0");  printf ("%s", color_colorize (sample, 128, color_def ("blue")));
     printf (" - rgb");
-    strcpy (sample, "0");  color_colorize (sample, 128, color_def ("red")); printf ("%s", sample);
-    strcpy (sample, "0");  color_colorize (sample, 128, color_def ("green")); printf ("%s", sample);
-    strcpy (sample, "0");  color_colorize (sample, 128, color_def ("blue")); printf ("%s", sample);
+    strcpy (sample, "0");  printf ("%s", color_colorize (sample, 128, color_def ("red")));
+    strcpy (sample, "0");  printf ("%s", color_colorize (sample, 128, color_def ("green")));
+    strcpy (sample, "0");  printf ("%s", color_colorize (sample, 128, color_def ("blue")));
     printf (" (also color16 - color231)\n");
 
     strcpy (sample, "0            "
@@ -118,8 +117,7 @@ int main (int argc, char** argv)
                     "3            "
                     "4            "
                     "5");
-    color_colorize (sample, 128, color_def ("bold red"));
-    printf ("  %s\n", sample);
+    printf ("  %s\n", color_colorize (sample, 128, color_def ("bold red")));
 
     strcpy (sample, "0 1 2 3 4 5  "
                     "0 1 2 3 4 5  "
@@ -127,14 +125,12 @@ int main (int argc, char** argv)
                     "0 1 2 3 4 5  "
                     "0 1 2 3 4 5  "
                     "0 1 2 3 4 5");
-    color_colorize (sample, 128, color_def ("bold blue"));
-    printf ("  %s\n", sample);
+    printf ("  %s\n", color_colorize (sample, 128, color_def ("bold blue")));
 
     for (g = 0; g < 6; ++g)
     {
       sprintf (sample, " %d", g);
-      color_colorize (sample, 128, color_def ("bold green"));
-      printf ("%s", sample);
+      printf ("%s", color_colorize (sample, 128, color_def ("bold green")));
 
       for (r = 0; r < 6; ++r)
       {
@@ -142,8 +138,7 @@ int main (int argc, char** argv)
         {
           sprintf (def, "on rgb%d%d%d", r, g, b);
           strcpy (sample, "  ");
-          color_colorize (sample, 128, color_def (def));
-          printf ("%s", sample);
+          printf ("%s", color_colorize (sample, 128, color_def (def)));
         }
 
         printf (" ");
@@ -160,8 +155,7 @@ int main (int argc, char** argv)
     {
       sprintf (def, "on gray%d", g);
       strcpy (sample, "  ");
-      color_colorize (sample, 128, color_def (def));
-      printf ("%s", sample);
+      printf ("%s", color_colorize (sample, 128, color_def (def)));
     }
 
     printf ("\n\n");
@@ -213,10 +207,11 @@ int main (int argc, char** argv)
       strcpy (sample, "Color sample: ");
       color_name (name, 128, c);
       strcat (sample, name);
-      color_colorize (sample, 128, c);
-      color_decode (decode, 128, c);
 
-      printf ("\n%s\nCode:   %d\nDecode: %s\n", sample, c, decode);
+      printf ("\n%s\nCode:   %d\nDecode: %s\n",
+              color_colorize (sample, 128, c),
+              c,
+              color_decode (decode, 128, c));
 
       if (strcmp (one, name))
         printf ("Original color '%s' interpreted as '%s'\n", one, name);
@@ -233,27 +228,27 @@ int main (int argc, char** argv)
       char name3[128];
 
       c1 = color_def (one);
-      strcpy (sample1, "Color sample: ");
-      strcat (sample1, one);
-      color_colorize (sample1, 128, c1);
-      color_decode (decode1, 128, c1);
-
       c2 = color_def (two);
-      strcpy (sample2, "Blend sample: ");
-      strcat (sample2, two);
-      color_colorize (sample2, 128, c2);
-      color_decode (decode2, 128, c2);
-
       c3 = color_blend (c1, c2);
-      strcpy (sample3, "Blended sample: ");
-      color_name (name3, 128, c3);
-      strcat (sample3, name3);
-      color_colorize (sample3, 128, c3);
-      color_decode (decode3, 128, c3);
 
-      printf ("\n%s\nCode:   %d\nDecode: %s\n",   sample1, c1, decode1);
-      printf ("\n%s\nCode:   %d\nDecode: %s\n",   sample2, c2, decode2);
-      printf ("\n%s\nCode:   %d\nDecode: %s\n\n", sample3, c3, decode3);
+      sprintf (sample1, "Color sample: %s", one);
+      sprintf (sample2, "Blend sample: %s", two);
+      sprintf (sample3, "Blended sample: %s", color_name (name3, 128, c3));
+
+      printf ("\n%s\nCode:   %d\nDecode: %s\n",
+              color_colorize (sample1, 128, c1),
+              c1,
+              color_decode (decode1, 128, c1));
+
+      printf ("\n%s\nCode:   %d\nDecode: %s\n",
+              color_colorize (sample2, 128, c2),
+              c2,
+              color_decode (decode2, 128, c2));
+
+      printf ("\n%s\nCode:   %d\nDecode: %s\n\n",
+              color_colorize (sample3, 128, c3),
+              c3,
+              color_decode (decode3, 128, c3));
     }
   }
 

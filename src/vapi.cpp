@@ -115,9 +115,9 @@ extern "C" void vapi_full_screen ()
 {
   char ti[MAX_TAPI_SIZE];
   char alt[MAX_TAPI_SIZE];
-  tapi_get ("ti", ti, MAX_TAPI_SIZE);
-  tapi_get ("Alt", alt, MAX_TAPI_SIZE);
-  output << ti << alt;
+
+  output << tapi_get ("ti", ti, MAX_TAPI_SIZE)
+         << tapi_get ("Alt", alt, MAX_TAPI_SIZE);
 
   full_screen = true;
 }
@@ -127,8 +127,8 @@ extern "C" void vapi_full_screen ()
 extern "C" void vapi_end_full_screen ()
 {
   char te[MAX_TAPI_SIZE];
-  tapi_get ("te", te, MAX_TAPI_SIZE);
-  output << te;
+
+  output << tapi_get ("te", te, MAX_TAPI_SIZE);
 
   full_screen = false;
 }
@@ -138,8 +138,8 @@ extern "C" void vapi_end_full_screen ()
 extern "C" void vapi_clear ()
 {
   char cl[MAX_TAPI_SIZE];
-  tapi_get ("cl", cl, MAX_TAPI_SIZE);
-  output << cl;
+
+  output << tapi_get ("cl", cl, MAX_TAPI_SIZE);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -150,8 +150,7 @@ extern "C" void vapi_moveto (int x, int y)
   CHECKY0 (y, "Invalid y coordinate passed to vapi_moveto.");
 
   char mv[MAX_TAPI_SIZE];
-  tapi_get_xy ("Mv", mv, MAX_TAPI_SIZE, x, y);
-  output << mv;
+  output << tapi_get_xy ("Mv", mv, MAX_TAPI_SIZE, x, y);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -178,8 +177,7 @@ extern "C" void vapi_color_text (color c, const char* text)
   if (buf)
   {
     strncpy (buf, text, safe_size);
-    color_colorize (buf, safe_size, c);
-    output << buf;
+    output << color_colorize (buf, safe_size, c);
     delete [] buf;
   }
 }
@@ -254,7 +252,7 @@ extern "C" void vapi_pos_color_text (int x, int y, color c, const char* text)
 // Draw a colored rectangle, cropping if necessary.
 extern "C" void vapi_rectangle (int x, int y, int w, int h, color c)
 {
-  CHECKC0 (c,     "Invalid color passed to vapi_rectangle.");
+  CHECKC0 (c, "Invalid color passed to vapi_rectangle.");
   CHECKW0 (w, "Invalid width.");
   CHECKW0 (h, "Invalid height.");
 
@@ -281,8 +279,8 @@ extern "C" void vapi_title (const char* title)
   CHECK0 (title, "Null pointer passed to vapi_title.");
 
   char ttl[MAX_TAPI_SIZE];
-  tapi_get_str ("Ttl", ttl, MAX_TAPI_SIZE, title);
-  output << ttl << std::flush;
+  output << tapi_get_str ("Ttl", ttl, MAX_TAPI_SIZE, title)
+         << std::flush;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

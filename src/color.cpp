@@ -217,10 +217,19 @@ extern "C" color color_def (const char* def)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Convert a color -> description
-extern "C" void color_name (char* buf, size_t size, color c)
+extern "C" const char* color_name (char* buf, size_t size, color c)
 {
-  CHECK0 (buf, "Null buffer pointer passed to color_name.");
-  CHECKC0 (c,  "Invalid color passed to color_name.");
+  if (!buf)
+  {
+    vitapi_set_error ("Null buffer pointer passed to color_name.");
+    return NULL;
+  }
+
+  if (c == -1)
+  {
+    vitapi_set_error ("Invalid color passed to color_name.");
+    return NULL;
+  }
 
   std::string description;
   if (c & _COLOR_BOLD) description += "bold";
@@ -244,18 +253,28 @@ extern "C" void color_name (char* buf, size_t size, color c)
   if (description.length () + 1 >= size)
   {
     vitapi_set_error ("Insufficient buffer size passed to color_name.");
-    return;
+    return buf;
   }
 
   strncpy (buf, description.c_str (), size);
+  return buf;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Convert a color -> bit description
-extern "C" void color_decode (char* buf, size_t size, color c)
+extern "C" const char* color_decode (char* buf, size_t size, color c)
 {
-  CHECK0 (buf, "Null buffer pointer passed to color_decode.");
-  CHECKC0 (c,  "Invalid color passed to color_decode.");
+  if (!buf)
+  {
+    vitapi_set_error ("Null buffer pointer passed to color_decode.");
+    return NULL;
+  }
+
+  if (c == -1)
+  {
+    vitapi_set_error ("Invalid color passed to color_decode.");
+    return NULL;
+  }
 
   std::stringstream description;
 
@@ -267,24 +286,21 @@ extern "C" void color_decode (char* buf, size_t size, color c)
   description << ((c & _COLOR_BRIGHT)    ? "BR-"  : "-");
 
   int bg = (c & _COLOR_BG) >> 8;
-  if (c & _COLOR_HASBG)
-    description << bg;
-  else
-    description << "-";
+  if (c & _COLOR_HASBG) description << bg;
+  description << "-";
 
   int fg = c & _COLOR_FG;
-  if (c & _COLOR_HASFG)
-    description << fg;
-  else
-    description << "-";
+  if (c & _COLOR_HASFG) description << fg;
+  description << "-";
 
   if (description.str ().length () + 1 >= size)
   {
     vitapi_set_error ("Insufficient buffer size passed to color_decode.");
-    return;
+    return buf;
   }
 
   strncpy (buf, description.str ().c_str (), size);
+  return buf;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -402,10 +418,19 @@ extern "C" color color_blend (color one, color two)
 //
 //   256 fg               \033[38;5;Nm
 //   256 bg               \033[48;5;Nm
-extern "C" void color_colorize (char* buf, size_t size, color c)
+extern "C" const char* color_colorize (char* buf, size_t size, color c)
 {
-  CHECK0 (buf, "Null buffer pointer passed to color_colorize.");
-  CHECKC0 (c, "Invalid color passed to color_colorize.");
+  if (!buf)
+  {
+    vitapi_set_error ("Null buffer pointer passed to color_colorize.");
+    return NULL;
+  }
+
+  if (c == -1)
+  {
+    vitapi_set_error ("Invalid color passed to color_colorize.");
+    return NULL;
+  }
 
   int count = 0;
   std::stringstream result;
@@ -477,10 +502,11 @@ extern "C" void color_colorize (char* buf, size_t size, color c)
   if (result.str ().size () + 1 >= size)
   {
     vitapi_set_error ("Insufficient buffer size passed to color_colorize.");
-    return;
+    return buf;
   }
 
   strncpy (buf, result.str ().c_str (), size);
+  return buf;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

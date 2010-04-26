@@ -38,20 +38,26 @@ int main (int argc, char** argv)
   tapi_add ("foo", "a:_E_ b:_E__s__B_ c:_x_,_y_ d:bunny e:_E__E__E__E__E__E__E__E_");
 
   char value[64];
-  tapi_get ("a", value, 64);
-  t.is (value, "\033", "_E_ -> \\033");
+  t.is (tapi_get ("a", value, 64),
+        "\033",
+        "_E_ -> \\033");
 
-  tapi_get_str ("b", value, 64, "dog");
-  t.is (value, "\033dog\007", "_E__s__B_ -> \\033dog\\007");
+  t.is (tapi_get_str ("b", value, 64, "dog"),
+        "\033dog\007",
+        "_E__s__B_ -> \\033dog\\007");
 
-  tapi_get_xy ("c", value, 64, 1, 2);
-  t.is (value, "1,2", "_x_,_y_ -> 1,2");
+  t.is (tapi_get_xy ("c", value, 64, 1, 2),
+        "1,2",
+        "_x_,_y_ -> 1,2");
 
-  tapi_get ("d", value, 64);
-  t.is (value, "bunny", "bunny -> bunny");
+  t.is (tapi_get ("d", value, 64),
+        "bunny",
+        "bunny -> bunny");
 
-  tapi_get ("e", value, 64);
-  t.is (value, "\033\033\033\033\033\033\033\033", "_E__E__E__E__E__E__E__E_ -> \\033\\033\\033\\033\\033\\033\\033\\033");
+  t.is (tapi_get ("e", value, 64),
+        "\033\033\033\033\033\033\033\033",
+        "_E__E__E__E__E__E__E__E_ -> \\033\\033\\033\\033\\033\\033\\033\\033");
+
   return 0;
 }
 

@@ -219,66 +219,101 @@ extern "C" void tapi_add (const char* term, const char* def)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Simply returns the control string - may or may not be ready to use.
-extern "C" void tapi_get (const char* key, char* value, size_t size)
+extern "C" const char* tapi_get (const char* key, char* value, size_t size)
 {
-  CHECK0 (key,   "Null pointer to a terminal key passed to tapi_get.");
-  CHECK0 (value, "Null pointer for a key value passed to tapi_get.");
+  if (!key)
+  {
+    vitapi_set_error ("Null pointer to a terminal key passed to tapi_get.");
+    return NULL;
+  }
+
+  if (!value)
+  {
+    vitapi_set_error ("Null pointer for a key value passed to tapi_get.");
+    return NULL;
+  }
 
   std::string s = decode (lookup (key));
 
   if (s.length () + 1 >= size)
   {
     vitapi_set_error ("Insufficient buffer size passed to tapi_get.");
-    return;
+    return value;
   }
 
   strncpy (value, s.c_str (), size);
+  return value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Returns the control string with [x,y] coordinate substitution, ready to use.
-extern "C" void tapi_get_xy (
+extern "C" const char* tapi_get_xy (
   const char* key,
   char* value,
   size_t size,
   int x,
   int y)
 {
-  CHECK0 (key,   "Null pointer to a terminal key passed to tapi_get_xy.");
-  CHECK0 (value, "Null pointer for a key value passed to tapi_get_xy.");
+  if (!key)
+  {
+    vitapi_set_error ("Null pointer to a terminal key passed to tapi_get_xy.");
+    return NULL;
+  }
+
+  if (!value)
+  {
+    vitapi_set_error ("Null pointer for a key value passed to tapi_get_xy.");
+    return NULL;
+  }
 
   std::string s = encode (decode (lookup (key)), x, y);
 
   if (s.length () + 1 >= size)
   {
     vitapi_set_error ("Insufficient buffer size passed to tapi_get_xy.");
-    return;
+    return value;
   }
 
   strncpy (value, s.c_str (), size);
+  return value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Returns the control string with string substitution, ready to use.
-extern "C" void tapi_get_str (
+extern "C" const char* tapi_get_str (
   const char* key,
   char* value,
   size_t size,
   const char* str)
 {
-  CHECK0 (key,   "Null pointer to a terminal key passed to tapi_get_str.");
-  CHECK0 (value, "Null pointer for a key value passed to tapi_get_str.");
-  CHECK0 (str,   "Null pointer for a substitution passed to tapi_get_str.");
+  if (!key)
+  {
+    vitapi_set_error ("Null pointer to a terminal key passed to tapi_get_str.");
+    return NULL;
+  }
+
+  if (!value)
+  {
+    vitapi_set_error ("Null pointer for a key value passed to tapi_get_str.");
+    return NULL;
+  }
+
+  if (!str)
+  {
+    vitapi_set_error ("Null pointer for a substitution passed to tapi_get_str.");
+    return value;
+  }
 
   std::string s = encode (decode (lookup (key)), str);
 
   if (s.length () + 1 >= size)
   {
     vitapi_set_error ("Insufficient buffer size passed to tapi_get_str.");
-    return;
+    return value;
   }
 
   strncpy (value, s.c_str (), size);
+  return value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
