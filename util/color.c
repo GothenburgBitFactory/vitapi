@@ -164,7 +164,7 @@ int main (int argc, char** argv)
       printf ("%s", sample);
     }
 
-    printf ("\n");
+    printf ("\n\n");
   }
 
   // Arguments comprise either a color definition, a color code, or
