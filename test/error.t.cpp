@@ -30,7 +30,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 int main (int argc, char** argv)
 {
-  UnitTest t (48);
+  UnitTest t (49);
 
   char error [256];
 
@@ -79,7 +79,12 @@ int main (int argc, char** argv)
                "color_name: invalid color");
 
   // color_downgrade
-  t.is (color_downgrade (0), -1, "color_downgrade -> -1");
+  t.is (color_downgrade (0, 16), -1, "color_downgrade 16 -> -1");
+  vitapi_error (error, 256);
+  t.is (error, "color_downgrade is not implemented.",
+               "color_downgrande: not implemented");
+
+  t.is (color_downgrade (0, 8), -1, "color_downgrade 8 -> -1");
   vitapi_error (error, 256);
   t.is (error, "color_downgrade is not implemented.",
                "color_downgrande: not implemented");

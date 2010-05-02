@@ -78,6 +78,9 @@
 
 #define _COLOR_DEFAULT   0              // Terminal default colors
 
+#define _COLOR_QUANTIZE_8   8           // Use only 8 colors
+#define _COLOR_QUANTIZE_16  16          // Use only 16 colors
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -90,7 +93,7 @@ color color_def (const char*);           // Parse definition: "red on white"
 const char* color_name (char*, size_t, color); // Convert a color -> description
 const char* color_decode (char*, size_t, color); // Convert a color -> bits
 color color_upgrade (color);             // Convert 16- to 256-color
-color color_downgrade (color);           // Convert 256- to 16-color, with loss
+color color_downgrade (color, int);      // Lossy conversion to 8 or 16 colors
 color color_blend (color, color);        // Blend two colors, possible upgrade
 const char* color_colorize (char*, size_t, color);
                                          // Colorize a string

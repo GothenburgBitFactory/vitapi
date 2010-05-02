@@ -46,6 +46,8 @@ static char color_names[][16] =
 static int color_index (const std::string&);
 static std::string color_fg (color);
 static std::string color_bg (color);
+static void rgb (int, int&, int&, int&);
+static int euclidean_distance (int, int, int, int, int, int);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Supports the following constructs:
@@ -337,10 +339,157 @@ extern "C" color color_upgrade (color c)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Convert 256- to 16-color, with loss
-extern "C" color color_downgrade (color)
+extern "C" color color_downgrade (color c, int quantity)
 {
-  vitapi_set_error ("color_downgrade is not implemented.");
-  return -1;
+  if (quantity != _COLOR_QUANTIZE_8 &&
+      quantity != _COLOR_QUANTIZE_16)
+  {
+    vitapi_set_error ("Color downgrade only supports 8 or 16 colors.");
+    return -1;
+  }
+
+  // Convert to 256 colors, to remove an entire dimension from the matrix.
+  color closest = c;
+  if (!(c & _COLOR_256))
+    closest = color_upgrade (c);
+
+  // Determine the rgb value for the color.
+  int fr, fg, fb;
+  rgb (closest & _COLOR_FG, fr, fg, fb);
+
+  int br, bg, bb;
+  rgb ((closest & _COLOR_BG) >> 8, br, bg, bb);
+
+  if (quantity == _COLOR_QUANTIZE_16)
+  {
+    static struct
+    {
+      int i;
+      int r;
+      int g;
+      int b;
+    } all[] =
+    {
+      {1,  0, 0, 0},  // black
+      {2,  3, 0, 0},  // red
+      {3,  0, 3, 0},  // green
+      {4,  3, 3, 0},  // yellow
+      {5,  0, 0, 3},  // blue
+      {6,  3, 0, 3},  // magenta
+      {7,  0, 3, 3},  // cyan
+      {8,  3, 3, 3},  // white
+
+      {9,  1, 1, 1},  // light black
+      {10, 5, 1, 1},  // light red
+      {11, 0, 5, 0},  // light green
+      {12, 5, 5, 0},  // light yellow
+      {13, 0, 0, 5},  // light blue
+      {14, 5, 0, 5},  // light magenta
+      {15, 0, 5, 5},  // light cyan
+      {16, 5, 5, 5},  // light white
+    };
+
+    int closest_fg = 376; // Max value + 1;
+    int closest_bg = 376; // Max value + 1;
+
+    int index_fg = 0;
+    int index_bg = 0;
+
+    for (int i = 0; i < 16; ++i)
+    {
+      int value = euclidean_distance (fr, fg, fb, all[i].r, all[i].g, all[i].b);
+      if (value < closest_fg)
+      {
+        closest_fg = value;
+        index_fg = all[i].i;
+      }
+
+      value = euclidean_distance (br, bg, bb, all[i].r, all[i].g, all[i].b);
+      if (value < closest_bg)
+      {
+        closest_bg = value;
+        index_bg = all[i].i;
+      }
+    }
+
+    // Reconstruct in 16-color form, without bold/bright.
+    closest &= ~_COLOR_256;
+    closest &= ~_COLOR_FG;
+    closest &= ~_COLOR_BG;
+
+    if (index_fg > 8)
+    {
+      closest |= index_fg - 8;
+      closest |= _COLOR_BOLD;
+    }
+    else
+    {
+      closest |= index_fg;
+    }
+
+    if (index_bg > 8)
+    {
+      closest |= ((index_bg - 8) << 8);
+      closest |= _COLOR_BRIGHT;
+    }
+    else
+    {
+      closest |= (index_bg << 8);
+    }
+  }
+
+  else if (quantity == _COLOR_QUANTIZE_8)
+  {
+    static struct
+    {
+      int i;
+      int r;
+      int g;
+      int b;
+    } all[] =
+    {
+      {1, 0, 0, 0},  // black
+      {2, 3, 0, 0},  // red
+      {3, 0, 3, 0},  // green
+      {4, 3, 3, 0},  // yellow
+      {5, 0, 0, 3},  // blue
+      {6, 3, 0, 3},  // magenta
+      {7, 0, 3, 3},  // cyan
+      {8, 3, 3, 3},  // white
+    };
+
+    int closest_fg = 376; // Max value + 1;
+    int closest_bg = 376; // Max value + 1;
+
+    int index_fg = 0;
+    int index_bg = 0;
+
+    for (int i = 0; i < 8; ++i)
+    {
+      int value = euclidean_distance (fr, fg, fb, all[i].r, all[i].g, all[i].b);
+      if (value < closest_fg)
+      {
+        closest_fg = value;
+        index_fg = all[i].i;
+      }
+
+      value = euclidean_distance (br, bg, bb, all[i].r, all[i].g, all[i].b);
+      if (value < closest_bg)
+      {
+        closest_bg = value;
+        index_bg = all[i].i;
+      }
+    }
+
+    // Reconstruct in 16-color form, without bold/bright.
+    closest &= ~_COLOR_256;
+    closest &= ~_COLOR_FG;
+    closest &= ~_COLOR_BG;
+    closest |= index_fg;
+    closest |= (index_bg << 8);
+  }
+
+  return closest;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -557,6 +706,57 @@ static std::string color_bg (color c)
     return color_names[index];
 
   return "";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+static void rgb (int i, int& r, int& g, int& b)
+{
+  // Basic 0 - 15
+  if (i < 16)
+  {
+    switch (i)
+    {
+      case 0:  r = 0; g = 0; b = 0; break;
+      case 1:  r = 3; g = 0; b = 0; break;
+      case 2:  r = 0; g = 3; b = 0; break;
+      case 3:  r = 3; g = 3; b = 0; break;
+      case 4:  r = 0; g = 0; b = 3; break;
+      case 5:  r = 3; g = 0; b = 3; break;
+      case 6:  r = 0; g = 3; b = 3; break;
+      case 7:  r = 3; g = 3; b = 3; break;
+      case 8:  r = 1; g = 1; b = 1; break;
+      case 9:  r = 5; g = 1; b = 1; break;
+      case 10: r = 0; g = 5; b = 0; break;
+      case 11: r = 5; g = 5; b = 0; break;
+      case 12: r = 0; g = 0; b = 5; break;
+      case 13: r = 5; g = 0; b = 5; break;
+      case 14: r = 0; g = 5; b = 5; break;
+      case 15: r = 5; g = 5; b = 5; break;
+    }
+  }
+
+  // Color cube 16 - 231
+  else if (i < 232)
+  {
+    r =  (i - 16) / 36;
+    g = ((i - 16) % 36) / 6;
+    b =  (i - 16) % 6;
+  }
+
+  // Gray ramp 232 - 255
+  else
+  {
+    r = g = b = ((i - 232) / 4);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// No point performing the square root.
+static int euclidean_distance (int r1, int g1, int b1, int r2, int g2, int b2)
+{
+  return ((r1 - r2) * (r1 - r2)) +
+         ((g1 - g2) * (g1 - g2)) +
+         ((b1 - b2) * (b1 - b2));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
