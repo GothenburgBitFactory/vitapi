@@ -170,6 +170,9 @@ extern "C" void vapi_color_text (color c, const char* text)
   CHECKC0 (c,    "Invalid color passed to vapi_color_text.");
   CHECK0  (text, "Null pointer passed to vapi_color_text.");
 
+/*
+  TODO Why does this code not work?
+
   // The longest color sequence is:   ^[ [ 4 ; 5 ; 38 ; 100 m <string> ^[ [ 0 m
   // That adds up to 13 (prologue) + 4 (epilogue) + 1 (null character) = 18.
   int safe_size = strlen (text) + 18;
@@ -180,6 +183,11 @@ extern "C" void vapi_color_text (color c, const char* text)
     output << color_colorize (buf, safe_size, c);
     delete [] buf;
   }
+*/
+
+  char buf [4096];
+  strncpy (buf, text, 4096);
+  output << color_colorize (buf, 4096, c);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
