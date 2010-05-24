@@ -349,16 +349,10 @@ extern "C" color color_downgrade (color c, int quantity)
   }
 
   // Convert to 256 colors, to remove an entire dimension from the matrix.
-  color closest = c;
   if (!(c & _COLOR_256))
-    closest = color_upgrade (c);
+    c = color_upgrade (c);
 
-  // Determine the rgb value for the color.
-  int fr, fg, fb;
-  rgb (closest & _COLOR_FG, fr, fg, fb);
-
-  int br, bg, bb;
-  rgb ((closest & _COLOR_BG) >> 8, br, bg, bb);
+  color new_color = 0;
 
   if (quantity == _COLOR_QUANTIZE_16)
   {
@@ -389,55 +383,66 @@ extern "C" color color_downgrade (color c, int quantity)
       {16, 5, 5, 5},  // light white
     };
 
-    int closest_fg = 376; // Max value + 1;
-    int closest_bg = 376; // Max value + 1;
-
-    int index_fg = 0;
-    int index_bg = 0;
-
-    for (int i = 0; i < 16; ++i)
+    if (c & _COLOR_HASFG)
     {
-      int value = euclidean_distance (fr, fg, fb, all[i].r, all[i].g, all[i].b);
-      if (value < closest_fg)
+      int r, g, b;
+      rgb (c & _COLOR_FG, r, g, b);
+
+      int distance = 376; // Max value + 1;
+      int choice = 0;
+      for (int i = 0; i < 16; ++i)
       {
-        closest_fg = value;
-        index_fg = all[i].i;
+        int value = euclidean_distance (r, g, b, all[i].r, all[i].g, all[i].b);
+        if (value < distance)
+        {
+          distance = value;
+          choice = all[i].i;
+        }
       }
 
-      value = euclidean_distance (br, bg, bb, all[i].r, all[i].g, all[i].b);
-      if (value < closest_bg)
+      new_color |= _COLOR_HASFG;
+      if (choice > 8)
       {
-        closest_bg = value;
-        index_bg = all[i].i;
+        new_color |= _COLOR_BOLD;
+        new_color |= choice - 8;
+      }
+      else
+      {
+        new_color |= choice;
       }
     }
 
-    // Reconstruct in 16-color form, without bold/bright.
-    closest &= ~_COLOR_256;
-    closest &= ~_COLOR_FG;
-    closest &= ~_COLOR_BG;
+    if (c & _COLOR_HASBG)
+    {
+      int r, g, b;
+      rgb ((c & _COLOR_BG) >> 8, r, g, b);
 
-    if (index_fg > 8)
-    {
-      closest |= index_fg - 8;
-      closest |= _COLOR_BOLD;
-    }
-    else
-    {
-      closest |= index_fg;
-    }
+      int distance = 376; // Max value + 1;
+      int choice = 0;
+      for (int i = 0; i < 16; ++i)
+      {
+        int value = euclidean_distance (r, g, b, all[i].r, all[i].g, all[i].b);
+        if (value < distance)
+        {
+          distance = value;
+          choice = all[i].i;
+        }
+      }
 
-    if (index_bg > 8)
-    {
-      closest |= ((index_bg - 8) << 8);
-      closest |= _COLOR_BRIGHT;
-    }
-    else
-    {
-      closest |= (index_bg << 8);
+      new_color |= _COLOR_HASBG;
+      if (choice > 8)
+      {
+        new_color |= _COLOR_BRIGHT;
+        new_color |= ((choice - 8) << 8);
+      }
+      else
+      {
+        new_color |= (choice << 8);
+      }
     }
   }
 
+  // Determine the rgb value for the color.
   else if (quantity == _COLOR_QUANTIZE_8)
   {
     static struct
@@ -458,38 +463,50 @@ extern "C" color color_downgrade (color c, int quantity)
       {8, 3, 3, 3},  // white
     };
 
-    int closest_fg = 376; // Max value + 1;
-    int closest_bg = 376; // Max value + 1;
-
-    int index_fg = 0;
-    int index_bg = 0;
-
-    for (int i = 0; i < 8; ++i)
+    if (c & _COLOR_HASFG)
     {
-      int value = euclidean_distance (fr, fg, fb, all[i].r, all[i].g, all[i].b);
-      if (value < closest_fg)
+      int r, g, b;
+      rgb (c & _COLOR_FG, r, g, b);
+
+      int distance = 376; // Max value + 1;
+      int choice = 0;
+      for (int i = 0; i < 8; ++i)
       {
-        closest_fg = value;
-        index_fg = all[i].i;
+        int value = euclidean_distance (r, g, b, all[i].r, all[i].g, all[i].b);
+        if (value < distance)
+        {
+          distance = value;
+          choice = all[i].i;
+        }
       }
 
-      value = euclidean_distance (br, bg, bb, all[i].r, all[i].g, all[i].b);
-      if (value < closest_bg)
-      {
-        closest_bg = value;
-        index_bg = all[i].i;
-      }
+      new_color |= _COLOR_HASFG;
+      new_color |= choice;
     }
 
-    // Reconstruct in 16-color form, without bold/bright.
-    closest &= ~_COLOR_256;
-    closest &= ~_COLOR_FG;
-    closest &= ~_COLOR_BG;
-    closest |= index_fg;
-    closest |= (index_bg << 8);
+    if (c & _COLOR_HASBG)
+    {
+      int r, g, b;
+      rgb ((c & _COLOR_BG) >> 8, r, g, b);
+
+      int distance = 376; // Max value + 1;
+      int choice = 0;
+      for (int i = 0; i < 8; ++i)
+      {
+        int value = euclidean_distance (r, g, b, all[i].r, all[i].g, all[i].b);
+        if (value < distance)
+        {
+          distance = value;
+          choice = all[i].i;
+        }
+      }
+
+      new_color |= _COLOR_HASBG;
+      new_color |= (choice << 8);
+    }
   }
 
-  return closest;
+  return new_color;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

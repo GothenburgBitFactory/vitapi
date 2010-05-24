@@ -33,7 +33,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 int main (int argc, char** argv)
 {
-  UnitTest t (1027);
+  UnitTest t (1045);
 
   // Auto upgrades.
   char value [256];
@@ -123,28 +123,28 @@ int main (int argc, char** argv)
   t.is (value, "\033[47mfoo\033[0m",     "on white             -> ^[[47m");
 
   // 256-color, basic colors.
-  char color [24];
+  char name [24];
   char codes [64];
   char description [64];
   for (int i = 0; i < 256; ++i)
   {
-    sprintf (color,       "color%d", i);
+    sprintf (name,        "color%d", i);
     sprintf (codes,       "\033[38;5;%dmfoo\033[0m", i);
     sprintf (description, "color%d -> ^[[38;5;%dm", i, i);
 
     strcpy (value, "foo");
-    color_colorize (value, 256, color_def (color));
+    color_colorize (value, 256, color_def (name));
     t.is (value, codes, description);
   }
 
   for (int i = 0; i < 256; ++i)
   {
-    sprintf (color,       "on color%d", i);
+    sprintf (name,        "on color%d", i);
     sprintf (codes,       "\033[48;5;%dmfoo\033[0m", i);
     sprintf (description, "on color%d -> ^[[48;5;%dm", i, i);
 
     strcpy (value, "foo");
-    color_colorize (value, 256, color_def (color));
+    color_colorize (value, 256, color_def (name));
     t.is (value, codes, description);
   }
 
@@ -154,12 +154,12 @@ int main (int argc, char** argv)
       for (int b = 0; b < 6; ++b)
       {
         int code = 16 + (r*36 + g*6 + b);
-        sprintf (color,       "rgb%d%d%d", r, g, b);
+        sprintf (name,        "rgb%d%d%d", r, g, b);
         sprintf (codes,       "\033[38;5;%dmfoo\033[0m", code);
         sprintf (description, "rgb%d%d%d -> ^[[38;5;%dm", r, g, b, code);
 
         strcpy (value, "foo");
-        color_colorize (value, 256, color_def (color));
+        color_colorize (value, 256, color_def (name));
         t.is (value, codes, description);
       }
 
@@ -168,12 +168,12 @@ int main (int argc, char** argv)
       for (int b = 0; b < 6; ++b)
       {
         int code = 16 + (r*36 + g*6 + b);
-        sprintf (color,       "on rgb%d%d%d", r, g, b);
+        sprintf (name,        "on rgb%d%d%d", r, g, b);
         sprintf (codes,       "\033[48;5;%dmfoo\033[0m", code);
         sprintf (description, "on rgb%d%d%d -> ^[[48;5;%dm", r, g, b, code);
 
         strcpy (value, "foo");
-        color_colorize (value, 256, color_def (color));
+        color_colorize (value, 256, color_def (name));
         t.is (value, codes, description);
       }
 
@@ -185,23 +185,23 @@ int main (int argc, char** argv)
 
   for (int i = 0; i < 24; ++i)
   {
-    sprintf (color,       "gray%d", i);
+    sprintf (name,        "gray%d", i);
     sprintf (codes,       "\033[38;5;%dmfoo\033[0m", i + 232);
     sprintf (description, "gray%d -> ^[[38;5;%dm", i + 232, i + 232);
 
     strcpy (value, "foo");
-    color_colorize (value, 256, color_def (color));
+    color_colorize (value, 256, color_def (name));
     t.is (value, codes, description);
   }
 
   for (int i = 0; i < 24; ++i)
   {
-    sprintf (color,       "on gray%d", i);
+    sprintf (name,        "on gray%d", i);
     sprintf (codes,       "\033[48;5;%dmfoo\033[0m", i + 232);
     sprintf (description, "on gray%d -> ^[[48;5;%dm", i + 232, i + 232);
 
     strcpy (value, "foo");
-    color_colorize (value, 256, color_def (color));
+    color_colorize (value, 256, color_def (name));
     t.is (value, codes, description);
   }
 
@@ -212,6 +212,40 @@ int main (int argc, char** argv)
   sprintf (value, "%d", c);
   c = color_def (value);
   t.is (color_name (value, 256, c), description, "round-trip");
+
+  // Downgrading is mapping from 256 -> 16 or 256 -> 8 colors.  Foreground first.
+  color white = color_def ("rgb555");
+  t.is (color_downgrade (white, 1), -1, "Cannot downgrade fg to 1 color");
+  t.is (color_downgrade (white, 2), -1, "Cannot downgrade fg to 2 color");
+  t.is (color_downgrade (white, 4), -1, "Cannot downgrade fg to 4 color");
+
+  t.is (color_downgrade (white, 16), color_def ("bold white"), "rgb555 -> @16 bold white");
+  t.is (color_downgrade (white, 8),  color_def ("white"),      "rgb555 -> @8 white");
+
+  color grey = color_def ("rgb011");
+  t.is (color_downgrade (grey, 16),  color_def ("bold black"), "rgb011 -> @16 bold black");
+  t.is (color_downgrade (grey, 8),   color_def ("black"),      "rgb011 -> @8 black");
+
+  color black = color_def ("rgb000");
+  t.is (color_downgrade (black, 16), color_def ("black"),      "rgb011 -> @16 black");
+  t.is (color_downgrade (black, 8),  color_def ("black"),      "rgb011 -> @8 black");
+
+  // Now background.
+  white = color_def ("on rgb555");
+  t.is (color_downgrade (white, 1), -1, "Cannot downgrade bg to 1 color");
+  t.is (color_downgrade (white, 2), -1, "Cannot downgrade bg to 2 color");
+  t.is (color_downgrade (white, 4), -1, "Cannot downgrade bg to 4 color");
+
+  t.is (color_downgrade (white, 16), color_def ("on bright white"), "on rgb555 -> @16 on bright white");
+  t.is (color_downgrade (white, 8),  color_def ("on white"),        "on rgb555 -> @8 on white");
+
+  grey = color_def ("on rgb011");
+  t.is (color_downgrade (grey, 16),  color_def ("on bright black"), "on rgb011 -> @16 on bright black");
+  t.is (color_downgrade (grey, 8),   color_def ("on black"),        "on rgb011 -> @8 on black");
+
+  black = color_def ("on rgb000");
+  t.is (color_downgrade (black, 16), color_def ("on black"),        "on rgb011 -> @16 on black");
+  t.is (color_downgrade (black, 8),  color_def ("on black"),        "on rgb011 -> @8 on black");
 
   return 0;
 }

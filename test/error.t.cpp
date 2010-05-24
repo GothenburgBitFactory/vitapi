@@ -30,7 +30,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 int main (int argc, char** argv)
 {
-  UnitTest t (49);
+  UnitTest t (45);
 
   char error [256];
 
@@ -77,17 +77,6 @@ int main (int argc, char** argv)
   vitapi_error (error, 256);
   t.is (error, "Invalid color passed to color_name.",
                "color_name: invalid color");
-
-  // color_downgrade
-  t.is (color_downgrade (0, 16), -1, "color_downgrade 16 -> -1");
-  vitapi_error (error, 256);
-  t.is (error, "color_downgrade is not implemented.",
-               "color_downgrande: not implemented");
-
-  t.is (color_downgrade (0, 8), -1, "color_downgrade 8 -> -1");
-  vitapi_error (error, 256);
-  t.is (error, "color_downgrade is not implemented.",
-               "color_downgrande: not implemented");
 
   // color_blend
   t.is (color_blend (-1, -1), -1, "blend -1, -1 -> error");
