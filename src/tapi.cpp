@@ -90,40 +90,66 @@ extern "C" int tapi_initialize (const char* term)
 
   std::string common = app_mode + normal_mode + mouse + move + alternate + title;
 
-  // Now the terminal-specific settings.  The following is a list of
-  // Lucid-supported terminal programs, which is a good starting point for the
-  // terminals that we might want to support:
-  //
-  // TODO aterm          - Afterstep XVT - a VT102 emulator for the X
-  // TODO aterm-ml       - Afterstep XVT - a VT102 emulator for the X
-  // TODO eterm          - Enlightened Terminal Emulator
-  // TODO fbiterm        - framebuffer internationalized terminal emu
-  // TODO fbterm         - A fast framebuffer based terminal emulator
-  // TODO gnome-terminal - The GNOME terminal emulator application
-  // TODO gtkterm        - A simple GTK+ serial port terminal
-  // TODO jfbterm        - multilingual terminal on Linux framebuffer
-  // TODO kterm          - Multi-lingual terminal emulator for X
-  // TODO lxterminal     - desktop independent vte-based terminal emu
-  // TODO mlterm         - MultiLingual TERMinal
-  // TODO mrxvt          - lightweight multi-tabbed X terminal emulator
-  // TODO multi-aterm    - tabbed terminal emulator with efficent pse
-  // TODO pterm          - PuTTY terminal emulator
-  // TODO roxterm        - Multi-tabbed GTK/VTE terminal emulator
-  // TODO rxvt           - VT102 terminal emulator for the X Window System
-  // TODO rxvt-unicode   - RXVT-like terminal emulator with Unicode support
-  // TODO terminal.app   - Terminal Emulator for GNUstep
-  // TODO terminator     - multiple GNOME terminals in one window
-  // TODO wterm          - lightweight terminal emulator for X
-  // TODO wterm-ml       - lightweight multilingual terminal emulator
-  // TODO xfce4-terminal - Xfce terminal emulator
-  // TODO xiterm         - internationalized terminal emulator for X
-  //
-  // Others:
-  //
-  // TODO vt100
-  // TODO vt102
-  // TODO vt220
-  // TODO xterm-color
+  data["vt100"] = data["vt102"] =
+    "ku:_E_OA "
+    "kd:_E_OB "
+    "kr:_E_OC "
+    "kl:_E_OD "
+    "k1:_E_OP "
+    "k2:_E_OQ "
+    "k3:_E_OR "
+    "k4:_E_OS "
+    "k5:_E_Ot "
+    "k6:_E_Ou "
+    "k7:_E_Ov "
+    "k8:_E_Ol "
+    "k9:_E_Ow "
+    "k0:_E_Oy "
+    "kb:8 "
+    "cl:_E_[H_E_[J$<50> "
+    + common;
+
+  data["vt220"] =
+    "ku:_E_[A "
+    "kd:_E_[B "
+    "kr:_E_[C "
+    "kl:_E_[D "
+    "k1:_E_OP "
+    "k2:_E_OQ "
+    "k3:_E_OR "
+    "k4:_E_OS "
+    "k6:_E_[17~ "
+    "k7:_E_[18~ "
+    "k8:_E_[19~ "
+    "k9:_E_[20~ "
+    "kb:8 "
+    "kP:_E_[5~ "
+    "kN:_E_[6~ "
+    "cl:_E_[H_E_[J "
+    + common;
+
+  data["xterm-color"] =
+    "ku:_E_OA "
+    "kd:_E_OB "
+    "kr:_E_OC "
+    "kl:_E_OD "
+    "k1:_E_[11~ "
+    "k2:_E_[12~ "
+    "k3:_E_[13~ "
+    "k4:_E_[14~ "
+    "k5:_E_[15~ "
+    "k6:_E_[17~ "
+    "k7:_E_[18~ "
+    "k8:_E_[19~ "
+    "k9:_E_[20~ "
+    "kb:8 "
+    "kD:_E_[3~ "
+    "kP:_E_[5~ "
+    "kN:_E_[6~ "
+    "ti:_E_7_E_[?47h "
+    "te:_E_[2J_E_[?47l_E_8 "
+    "cl:_E_[H_E_[2J "
+    + common;
 
   data["xterm"] = data["xterm-256color"] =
     "ku:_E_OA "
