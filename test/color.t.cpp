@@ -33,7 +33,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 int main (int argc, char** argv)
 {
-  UnitTest t (1045);
+  UnitTest t (1048);
+
+  // Non-color.
+  t.is (color_def ("none"),         0, "none -> 0");
+  t.is (color_def ("on none"),      0, "on none -> 0");
+  t.is (color_def ("none on none"), 0, "none on none -> 0");
 
   // Auto upgrades.
   char value [256];

@@ -75,7 +75,7 @@ extern "C" color color_def (const char* def)
 
   // By converting underscores to spaces, we inherently support the old "on_red"
   // style of specifying background colors.  We consider underscores to be
-  // deprecated.
+  // deprecated, but convenient.
   std::string modifiable_spec = def;
   std::replace (modifiable_spec.begin (), modifiable_spec.end (), '_', ' ');
 
@@ -105,15 +105,18 @@ extern "C" color color_def (const char* def)
     // X where X is one of black, red, blue ...
     else if ((index = color_index (word)) != -1)
     {
-      if (bg)
+      if (index)
       {
-        bg_value |= _COLOR_HASBG;
-        bg_value |= index << 8;
-      }
-      else
-      {
-        fg_value |= _COLOR_HASFG;
-        fg_value |= index;
+        if (bg)
+        {
+          bg_value |= _COLOR_HASBG;
+          bg_value |= index << 8;
+        }
+        else
+        {
+          fg_value |= _COLOR_HASFG;
+          fg_value |= index;
+        }
       }
     }
 
@@ -523,6 +526,10 @@ extern "C" color color_blend (color one, color two)
 
   if (one == -1) return two;          // if one is bad, result -> two
   if (two == -1) return one;          // if two is bad, result -> one
+
+  // Blending two non-colors is a NOP.
+  if (one == 0 && two == 0)
+    return one;
 
   one |= (two & _COLOR_UNDERLINE);    // Always inherit underline.
 
