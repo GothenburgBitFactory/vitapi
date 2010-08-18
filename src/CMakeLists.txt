@@ -12,3 +12,8 @@ add_library (vitapi STATIC ${vitapi_SRCS})
 set (CMAKE_INSTALL_LIBDIR lib CACHE PATH "Output directory for libraries")
 install (TARGETS vitapi DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install (FILES vitapi.h DESTINATION include)
+
+set (CMAKE_BUILD_TYPE debug)
+set (CMAKE_C_FLAGS_DEBUG "-ggdb3")
+set (CMAKE_C_FLAGS_RELEASE "-O3")
+
