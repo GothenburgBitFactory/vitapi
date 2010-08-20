@@ -10,4 +10,3 @@ target_link_libraries(color vitapi)
 set (CMAKE_BUILD_TYPE debug)
 set (CMAKE_C_FLAGS_DEBUG "-ggdb3")
 set (CMAKE_C_FLAGS_RELEASE "-O3")
-
