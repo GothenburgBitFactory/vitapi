@@ -4,6 +4,7 @@ date > all.log
 
 for i in *.t
 do
+  echo "#" $i >> all.log
   ./$i >> all.log 2>&1
 done
 
