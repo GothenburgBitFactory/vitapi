@@ -100,6 +100,7 @@ extern "C" color color_def (const char* def)
          if (word == "bold")      fg_value |= _COLOR_BOLD;
     else if (word == "bright")    bg_value |= _COLOR_BRIGHT;
     else if (word == "underline") fg_value |= _COLOR_UNDERLINE;
+    else if (word == "inverse")   fg_value |= _COLOR_INVERSE;
     else if (word == "on")        bg = true;
 
     // X where X is one of black, red, blue ...
@@ -239,6 +240,9 @@ extern "C" const char* color_name (char* buf, size_t size, color c)
   std::string description;
   if (c & _COLOR_BOLD) description += "bold";
 
+  if (c & _COLOR_INVERSE)
+    description += std::string (description.length () ? " " : "") + "inverse";
+
   if (c & _COLOR_UNDERLINE)
     description += std::string (description.length () ? " " : "") + "underline";
 
@@ -286,6 +290,7 @@ extern "C" const char* color_decode (char* buf, size_t size, color c)
   description << ((c & _COLOR_256)       ? "256-" : "-");
   description << ((c & _COLOR_HASBG)     ? "BG-"  : "-");
   description << ((c & _COLOR_HASFG)     ? "FG-"  : "-");
+  description << ((c & _COLOR_INVERSE)   ? "I-"   : "-");
   description << ((c & _COLOR_UNDERLINE) ? "U-"   : "-");
   description << ((c & _COLOR_BOLD)      ? "BO-"  : "-");
   description << ((c & _COLOR_BRIGHT)    ? "BR-"  : "-");
@@ -532,6 +537,7 @@ extern "C" color color_blend (color one, color two)
     return one;
 
   one |= (two & _COLOR_UNDERLINE);    // Always inherit underline.
+  one |= (two & _COLOR_INVERSE);      // Always inherit inverse.
 
   // 16 <-- 16.
   if (!(one & _COLOR_256) &&
@@ -619,6 +625,12 @@ extern "C" const char* color_colorize (char* buf, size_t size, color c)
       needTerminator = true;
     }
 
+    if (c & _COLOR_INVERSE)
+    {
+      result << "\033[7m";
+      needTerminator = true;
+    }
+
     if (c & _COLOR_HASFG)
     {
       result << "\033[38;5;" << (c & _COLOR_FG) << "m";
@@ -651,6 +663,12 @@ extern "C" const char* color_colorize (char* buf, size_t size, color c)
     {
       if (count++) result << ";";
       result << "4";
+    }
+
+    if (c & _COLOR_INVERSE)
+    {
+      if (count++) result << ";";
+      result << "7";
     }
 
     if (c & _COLOR_HASFG)

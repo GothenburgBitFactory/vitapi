@@ -12,6 +12,7 @@
  + Unimplemented color_downgrade.
  + Bug: ioctl(... TIOCINQ ...) not working on Cygwin, so a new algorithm was
    implemented.
+ + Implemented 'inverse' as a color attribute that acts like 'underline'.
 
 ------ old releases ------------------------------
 
