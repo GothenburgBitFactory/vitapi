@@ -106,6 +106,7 @@ void iapi_echo ();                       // Enable echo
 void iapi_noecho ();                     // Disable echo
 void iapi_raw ();                        // Enable raw mode
 void iapi_noraw ();                      // Disable raw mode
+void iapi_cooked ();                     // Disable raw mode
 void iapi_mouse ();                      // Enable mouse clicks
 void iapi_nomouse ();                    // Disable mouse clicks
 void iapi_mouse_tracking ();             // Enable mouse clicks and tracking

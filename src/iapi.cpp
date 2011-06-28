@@ -152,6 +152,16 @@ extern "C" void iapi_noraw ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Disable raw mode
+extern "C" void iapi_cooked ()
+{
+  struct termios tmp;
+  tcgetattr (0, &tmp);
+  tmp.c_lflag |= ICANON;
+  tcsetattr (0, TCSANOW, &tmp);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Enable mouse clicks
 // Note: Without the std::flush, no mouse events are received, until a key is
 // pressed.
