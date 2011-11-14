@@ -1,6 +1,8 @@
 
 1.0.0 ()
  + Converted to MIT license.
+ + Bug: UTF8 strings were assumed to be ASCII and were incorrectly truncated
+   at the right margin.
 
 ------ current release ---------------------------
 

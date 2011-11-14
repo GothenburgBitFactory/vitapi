@@ -51,6 +51,7 @@ static void setupSignalHandler ();
 static void restoreSignalHandler ();
 static void getTerminalSize (int&, int&);
 static void handler (int);
+static int utf8_length (const std::string&);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize visual processing.
@@ -199,7 +200,8 @@ extern "C" void vapi_pos_text (int x, int y, const char* text)
   CHECK0  (text, "Null pointer passed to vapi_pos_text.");
 
   // Don't bother displaying off-screen text.
-  int len = strlen (text);
+  int full_len = strlen (text);
+  int len = utf8_length (text);
   if (y < 1            ||
       y > screenHeight ||
       x > screenWidth  ||
@@ -207,7 +209,7 @@ extern "C" void vapi_pos_text (int x, int y, const char* text)
     return;
 
   // Amount of text that should be truncated off the left or right.
-  int ltrunc  = 0;
+  int ltrunc = 0;
   int rtrunc = 0;
 
   if (x < 1)
@@ -220,7 +222,11 @@ extern "C" void vapi_pos_text (int x, int y, const char* text)
     rtrunc = x + len - 1 - screenWidth;
 
   vapi_moveto (x, y);
-  vapi_text (std::string (text).substr (ltrunc, len - ltrunc - rtrunc).c_str ());
+  if (ltrunc != 0 ||
+      rtrunc != 0)
+    vapi_text (std::string (text).substr (ltrunc, full_len - ltrunc - rtrunc).c_str ());
+  else
+    vapi_text (text);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -232,7 +238,8 @@ extern "C" void vapi_pos_color_text (int x, int y, color c, const char* text)
   CHECK0  (text, "Null pointer passed to vapi_pos_color_text.");
 
   // Don't bother displaying off-screen text.
-  int len = strlen (text);
+  int full_len = strlen (text);
+  int len = utf8_length (text);
   if (y < 1            ||
       y > screenHeight ||
       x > screenWidth  ||
@@ -240,7 +247,7 @@ extern "C" void vapi_pos_color_text (int x, int y, color c, const char* text)
     return;
 
   // Amount of text that should be truncated off the left or right.
-  int ltrunc  = 0;
+  int ltrunc = 0;
   int rtrunc = 0;
 
   if (x < 1)
@@ -253,8 +260,12 @@ extern "C" void vapi_pos_color_text (int x, int y, color c, const char* text)
     rtrunc = x + len - 1 - screenWidth;
 
   vapi_moveto (x, y);
-  vapi_color_text (
-    c, std::string (text).substr (ltrunc, len - ltrunc - rtrunc).c_str ());
+  if (ltrunc != 0 ||
+      rtrunc != 0)
+    vapi_color_text (
+      c, std::string (text).substr (ltrunc, full_len - ltrunc - rtrunc).c_str ());
+  else
+    vapi_color_text (c, text);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -362,5 +373,23 @@ static void handler (int sig)
   // NOP for all other (trapped) signals.
 }
 
+////////////////////////////////////////////////////////////////////////////////
+static int utf8_length (const std::string& str)
+{
+  int byteLength = str.length ();
+  int charLength = byteLength;
+  const char* data = str.data ();
+
+  // Decrement the number of bytes for each byte that matches 0b10??????
+  // this way only the first byte of any utf8 sequence is counted.
+  for (int i = 0; i < byteLength; i++)
+  {
+    // Extract the first two bits and check whether they are 10
+    if ((data[i] & 0xC0) == 0x80)
+      charLength--;
+  }
+
+  return charLength;
+}
 ////////////////////////////////////////////////////////////////////////////////
 

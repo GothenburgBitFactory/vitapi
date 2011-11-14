@@ -11,3 +11,7 @@ A: Perhaps you should.  Vitapi is a lightweight replacement for only some of the
    basic ncurses features, without the legacy terminal support, and with a nice
    color model that includes 256 color support.
 
+Q: Does vitapi work with UTF8 strings?
+A: It should, but there could still be bugs.  Please report anythign you see
+   that is wrong.
+
