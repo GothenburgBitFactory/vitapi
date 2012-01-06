@@ -1,7 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
-// VITapi - UI helper library that controls Visuals, Input and Terminals.
+// libkronisk - Date/Time/Duration Library
 //
-// Copyright 2006-2012, Göteborg Bit Factory.
+// Copyright 2006 - 2012, Göteborg Bit Factory.
+// Copyright 2006 - 2012, Paul Beckingham, Federico Hernandez.
 // All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,6 +26,7 @@
 // http://www.opensource.org/licenses/mit-license.php
 //
 ////////////////////////////////////////////////////////////////////////////////
+
 #ifndef INCLUDED_UNITTEST
 #define INCLUDED_UNITTEST
 
@@ -45,7 +47,8 @@ public:
   void is (size_t, size_t, const std::string&);
   void is (int, int, const std::string&);
   void is (double, double, const std::string&);
-  void is (char, char, const std::string&);
+  void is (double, double, double, const std::string&);
+  void is (unsigned char, unsigned char, const std::string&);
   void is (const std::string&, const std::string&, const std::string&);
   void is (const char*, const char*, const std::string&);
   void diag (const std::string&);
