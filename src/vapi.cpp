@@ -66,7 +66,7 @@ extern "C" int vapi_initialize ()
 
     char hs[MAX_TAPI_SIZE];
     tapi_get ("hs", hs, MAX_TAPI_SIZE);
-    has_status = hs != "" ? true : false;
+    has_status = strcmp (hs, "") ? true : false;
 
     getTerminalSize (screenWidth, screenHeight);
     setupSignalHandler ();
