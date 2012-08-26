@@ -35,6 +35,7 @@
 #include <termios.h>
 #include <sys/select.h>
 #include <sys/fcntl.h>
+#include <unistd.h>
 
 #ifdef USE_OLD_NON_PORTABLE_TECHNIQUE
 #include <sys/ioctl.h>
