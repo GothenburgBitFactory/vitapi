@@ -2,7 +2,6 @@
 // VITapi - UI helper library that controls Visuals, Input and Terminals.
 //
 // Copyright 2006-2012, Göteborg Bit Factory.
-// All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -84,7 +83,8 @@ std::string lowerCase (const std::string& input)
 int autoComplete (
   const std::string& partial,
   const std::vector<std::string>& list,
-  std::vector<std::string>& matches)
+  std::vector<std::string>& matches,
+  int minimum/* = 1*/)
 {
   matches.clear ();
 
@@ -92,7 +92,8 @@ int autoComplete (
   unsigned int length = partial.length ();
   if (length)
   {
-    foreach (item, list)
+    std::vector <std::string>::const_iterator item;
+    for (item = list.begin (); item != list.end (); ++item)
     {
       // An exact match is a special case.  Assume there is only one exact match
       // and return immediately.
@@ -104,7 +105,8 @@ int autoComplete (
       }
 
       // Maintain a list of partial matches.
-      if (length <= item->length () &&
+      else if (length >= (unsigned) minimum &&
+               length <= item->length ()    &&
           partial == item->substr (0, length))
         matches.push_back (*item);
     }

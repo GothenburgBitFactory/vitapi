@@ -2,7 +2,6 @@
 // VITapi - UI helper library that controls Visuals, Input and Terminals.
 //
 // Copyright 2006-2012, Göteborg Bit Factory.
-// All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +24,7 @@
 // http://www.opensource.org/licenses/mit-license.php
 //
 ////////////////////////////////////////////////////////////////////////////////
+
 #ifndef INCLUDED_UTIL
 #define INCLUDED_UTIL
 
@@ -40,14 +40,6 @@
 #ifndef max
 #define max(a,b) ((a) > (b) ? (a) : (b))
 #endif
-
-#define foreach(i, c)                                              \
-for (typeof (c) *foreach_p = & (c);                                \
-     foreach_p;                                                    \
-     foreach_p = 0)                                                \
-  for (typeof (foreach_p->begin()) i = foreach_p->begin();         \
-       i != foreach_p->end();                                      \
-       ++i)
 
 void split (std::vector<std::string>&, const std::string&, const char);
 std::string trimLeft (const std::string& in, const std::string& t = " ");
