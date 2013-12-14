@@ -1,9 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // libkronisk - Date/Time/Duration Library
 //
-// Copyright 2006 - 2012, Göteborg Bit Factory.
 // Copyright 2006 - 2012, Paul Beckingham, Federico Hernandez.
-// All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -57,11 +55,11 @@ public:
   void skip (const std::string&);
 
 private:
-  int mPlanned;
-  int mCounter;
-  int mPassed;
-  int mFailed;
-  int mSkipped;
+  int _planned;
+  int _counter;
+  int _passed;
+  int _failed;
+  int _skipped;
 };
 
 #endif
