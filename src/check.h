@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // VITapi - UI helper library that controls Visuals, Input and Terminals.
 //
-// Copyright 2009-2012, Göteborg Bit Factory.
+// Copyright 2009 - 2014, Göteborg Bit Factory.
 // All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
