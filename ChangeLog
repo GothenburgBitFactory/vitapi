@@ -1,20 +1,20 @@
 
 1.0.0 ()
- + Converted to MIT license.
- + Bug: UTF8 strings were assumed to be ASCII and were incorrectly truncated
-   at the right margin.
- + Updated URLs.
+- Converted to MIT license.
+- Bug: UTF8 strings were assumed to be ASCII and were incorrectly truncated
+  at the right margin.
+- Updated URLs.
 
 ------ current release ---------------------------
 
 0.8.0alpha ()
- + Alpha release with xterm, xterm-256color, rxvt and rxvt-unicode terminal
-   support only.
- + No installation of library, header, man pages.
- + Unimplemented color_downgrade.
- + Bug: ioctl(... TIOCINQ ...) not working on Cygwin, so a new algorithm was
-   implemented.
- + Implemented 'inverse' as a color attribute that acts like 'underline'.
+- Alpha release with xterm, xterm-256color, rxvt and rxvt-unicode terminal
+  support only.
+- No installation of library, header, man pages.
+- Unimplemented color_downgrade.
+- Bug: ioctl(... TIOCINQ ...) not working on Cygwin, so a new algorithm was
+  implemented.
+- Implemented 'inverse' as a color attribute that acts like 'underline'.
 
 ------ old releases ------------------------------
 
