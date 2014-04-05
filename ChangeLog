@@ -1,5 +1,7 @@
 
 1.0.0 ()
+- TW-1296 make test/run_all exit with non-zero code if a test fail (thanks to
+          Jakub Wilk).
 - Converted to MIT license.
 - Bug: UTF8 strings were assumed to be ASCII and were incorrectly truncated
   at the right margin.
