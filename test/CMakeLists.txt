@@ -7,3 +7,7 @@ add_executable (color.t color.t.cpp test.cpp)
 target_link_libraries (color.t vitapi)
 add_executable (error.t error.t.cpp test.cpp)
 target_link_libraries (error.t vitapi)
+
+configure_file(run_all run_all COPYONLY)
+configure_file(problems problems COPYONLY)
+
