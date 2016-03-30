@@ -1,5 +1,4 @@
 ////////////////////////////////////////////////////////////////////////////////
-// libkronisk - Date/Time/Duration Library
 //
 // Copyright 2006 - 2016, Paul Beckingham, Federico Hernandez.
 //
@@ -53,6 +52,11 @@ public:
   void pass (const std::string&);
   void fail (const std::string&);
   void skip (const std::string&);
+
+private:
+  std::string red (const std::string&);
+  std::string green (const std::string&);
+  std::string yellow (const std::string&);
 
 private:
   int _planned;
