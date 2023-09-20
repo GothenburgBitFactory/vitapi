@@ -12,6 +12,6 @@ A: Perhaps you should.  Vitapi is a lightweight replacement for only some of the
    color model that includes 256 color support.
 
 Q: Does vitapi work with UTF8 strings?
-A: It should, but there could still be bugs.  Please report anythign you see
+A: It should, but there could still be bugs.  Please report anything you see
    that is wrong.
 
